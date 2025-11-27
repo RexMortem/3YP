@@ -8,6 +8,7 @@ use nom::{
   character::complete::multispace0,
   bytes::complete::{tag, take_while1},
   multi::many0,
+  branch::{alt},
 };
 
 use crate::ast::*;
@@ -20,18 +21,32 @@ where
     delimited(multispace0, inner, multispace0)
 }
 
-fn parse_statement(input: &str) -> IResult<&str, Statement>{
-    let (input, digits) = take_while1(nom::AsChar::is_dec_digit)(input)?;
+// grammar
 
-    Ok((input, Statement::Expr(Expr::Int(i64::from_str(digits).unwrap()))))
+fn parse_program(input: &str) -> IResult<&str, Vec<Statement>>{
+    parse_statement_list(input)
 }
 
 fn parse_statement_list(input: &str) -> IResult<&str, Vec<Statement>>{
     many0(terminated(parse_statement, eat_whitespace(tag(";"))))(input)
 }   
 
-fn parse_program(input: &str) -> IResult<&str, Vec<Statement>>{
-    parse_statement_list(input)
+fn parse_statement(input: &str) -> IResult<&str, Statement>{
+    alt((parse_var_declaration, parse_assignment)).parse(input)
+}
+
+fn parse_var_declaration(input: &str) -> IResult<&str, Expr>{
+
+}
+
+fn parse_assignment(input: &str) -> IResult<&str, Expr>{
+
+}
+
+fn parse_int_literal(input: &str) -> IResult<&str, Expr>{
+    let (input, digits) = take_while1(nom::AsChar::is_dec_digit)(input)?;
+
+    Ok((input, Statement::Expr(Expr::Int(i64::from_str(digits).unwrap()))))
 }
 
 /*

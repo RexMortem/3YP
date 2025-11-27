@@ -28,6 +28,11 @@ pub enum Expr {
     Div(Box<Expr>, Box<Expr>),
 }
 
+// functionality for enums
+
+
+
+// display opt-ins
 impl fmt::Display for Expr {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         match self {
@@ -51,3 +56,4 @@ impl fmt::Display for Statement {
         }
     }
 }
+
