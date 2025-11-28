@@ -18,11 +18,8 @@ assignment ::= "=" expr # decided to treat assignment separately from expression
 
 expr ::= additive_term # need to extend this to bool operators later
 
-additive_term ::= multiplicative_term additive_term_prime
-additive_term_prime ::= ("+"|"-") multiplicative_term additive_term_prime | epsilon
-
-multiplicative_term ::= unary_term multiplicative_term_prime
-multiplicative_term_prime ::= ("*"|"/") unary_term multiplicative_term_prime | epsilon
+additive_term ::= multiplicative_term (("+"|"-") multiplicative_term)*
+multiplicative_term ::= unary_term (("*"|"/") unary_term)*
 
 unary_term ::= "-" unary_term | primary_term
 

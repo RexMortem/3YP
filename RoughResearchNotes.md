@@ -6,3 +6,5 @@ Concept of existential variables from Verse is interesting (seems to be the same
 - Assertion: fact-checking for specific properties from the distributions
 - Could-Have/Extension of the project: graphical representation
 - Distinction between "sampling" operations and "combining" operations
+
+- LR parsing is more powerful (check power of LR vs LL)
