@@ -3,7 +3,8 @@
 program ::= statementList
 statementList ::= statement ";" statementList | epsilon
 
-statement ::= var_declaration | assignment
+statement ::= var_declaration | statement_assignment
+statement_assignment ::= var assignment
 
 var_declaration ::= "let" var var_declaration_prime
 var_declaration_prime ::= assignment | epsilon
@@ -14,7 +15,7 @@ dist_type ::= "uniform" # only implementing uniform for now
 
 res_type ::= "int" # only int for now
 
-assignment ::= "=" expr # decided to treat assignment separately from expression 
+assignment ::= "=" expr 
 
 expr ::= additive_term # need to extend this to bool operators later
 

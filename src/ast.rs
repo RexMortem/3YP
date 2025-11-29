@@ -2,15 +2,15 @@ use std::fmt;
 
 #[derive(Debug, Clone)]
 pub enum Statement {
-    Let {
-        name: String,
-        value: Expr,
-    },
+    Decl(Expr),
     Assign {
-        name: String,
+        name: Expr,
         value: Expr,
     },
-    Expr(Expr),
+    DeclAssign {
+        name: Expr,
+        value: Expr,
+    }
 }
 
 #[derive(Debug, Clone)]
@@ -50,8 +50,8 @@ impl fmt::Display for Expr {
 impl fmt::Display for Statement {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         match self {
-            Statement::Expr(expr) => write!(f, "{}", expr),
-            Statement::Let { name, value } => write!(f, "let {} = {};", name, value),
+            Statement::DeclAssign { name, value } => write!(f, "let {} = {};", name, value),
+            Statement::Decl(name) => write!(f, "let {};", name),
             Statement::Assign { name, value } => write!(f, "{} = {};", name, value),
         }
     }

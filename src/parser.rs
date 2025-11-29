@@ -4,17 +4,18 @@ use nom::{
   IResult,
   Parser,
   error::ParseError,
-  sequence::{delimited, terminated},
+  sequence::{delimited, terminated, pair, preceded},
   character::complete::multispace0,
   bytes::complete::{tag, take_while1},
   multi::many0,
   branch::{alt},
+  combinator::{opt}
 };
 
 use crate::ast::*;
 
 // utility
-fn eat_whitespace<'a, F: 'a, O>(inner: F) -> impl FnMut(&'a str) -> IResult<&'a str, O>
+fn eat_ws<'a, F: 'a, O>(inner: F) -> impl FnMut(&'a str) -> IResult<&'a str, O>
 where
     F: Fn(&'a str) -> IResult<&'a str, O>,
 {
@@ -28,56 +29,84 @@ fn parse_program(input: &str) -> IResult<&str, Vec<Statement>>{
 }
 
 fn parse_statement_list(input: &str) -> IResult<&str, Vec<Statement>>{
-    many0(terminated(parse_statement, eat_whitespace(tag(";"))))(input)
+    many0(terminated(parse_statement, eat_ws(tag(";"))))(input)
 }   
 
 fn parse_statement(input: &str) -> IResult<&str, Statement>{
-    alt((parse_var_declaration, parse_assignment)).parse(input)
+    alt((parse_var_declaration, parse_statement_assignment)).parse(input)
 }
 
-fn parse_var_declaration(input: &str) -> IResult<&str, Expr>{
-
+fn parse_statement_assignment(input: &str) -> IResult<&str, Statement>{
+    let (input, var_expr) = eat_ws(parse_var)(input)?;
+    let (input, rhs_expr) = eat_ws(parse_assignment)(input)?;
+    Ok((input, Statement::Assign {
+        name: var_expr,
+        value: rhs_expr,
+    }))
 }
 
-fn partial_parse_assignment(input: &str, variable_node: Expr) -> IResult<&str, Expr>{
-    
+fn parse_var_declaration(input: &str) -> IResult<&str, Statement>{
+    let (input, var_expr) = preceded(eat_ws(tag("let")), eat_ws(parse_var)).parse(input)?;
+    let (input, maybe_assignment) = opt(eat_ws(parse_assignment)).parse(input)?;
+
+    match maybe_assignment {
+        Some(rhs_expr) => {
+            Ok((input, Statement::DeclAssign {
+                name: var_expr, 
+                value: rhs_expr
+            }))
+        },
+        None => {
+            Ok((input, Statement::Decl(var_expr)))
+        }
+    }
 }
 
-fn parse_assignment(input: &str) -> IResult<&str, Statement>{
-
+fn parse_assignment(input: &str) -> IResult<&str, Expr>{
+    preceded(eat_ws(tag("=")), eat_ws(parse_expr))(input)
 }
 
 // expression parsing
 
 /*
-    additive_term ::= multiplicative_term additive_term_prime
-    additive_term_prime ::= ("+"|"-") multiplicative_term additive_term_prime | epsilon
-
-    if additive_term_prime is epsilon -> don't construct an ASTnode for expr
-    if additive_term_prime is something -> construct an Expr<add>
+    expr (additive_term) ::= multiplicative_term (("+"|"-") multiplicative_term)*
+    multiplicative_term ::= unary_term (("*"|"/") unary_term)*
 */
 fn parse_expr(input: &str) -> IResult<&str, Expr>{
-    let (input, mul_term) = parse_mul_term(input)?;
-    let (input, add_term_prime) = parse_additive_term_prime(input)?;
-    
+    let (input, first_mul) = eat_ws(parse_mul_term)(input)?;
+    let (input, additive_terms) = many0(pair(
+        alt((eat_ws(tag("+")), eat_ws(tag("-")))),
+        eat_ws(parse_mul_term))
+    )(input)?;
+
+    let mut current_tail: Expr = first_mul; // can be either Mul<Box<Expr>> (initially) or Add<Box<Expr>, Box<Expr>>
+
+    for (operator, mul_term) in additive_terms {
+        match operator {
+            "+" => {
+                current_tail = Expr::Add(Box::new(current_tail), Box::new(mul_term));
+            },
+            "-" => {
+                current_tail = Expr::Sub(Box::new(current_tail), Box::new(mul_term));
+            },
+            _ => ()
+        }
+    }
+
+    Ok((input, current_tail))
 }
 
-fn parse_additive_term_prime() -> IResult<&str, Expr>{
-
-}
-
-
-/*
-    multiplicative_term ::= unary_term multiplicative_term_prime
-    multiplicative_term_prime ::= ("*"|"/") unary_term multiplicative_term_prime | epsilon
-*/
 fn parse_mul_term(input: &str) -> IResult<&str, Expr>{
-
+    eat_ws(parse_int_literal)(input)
 }
 
 /*
     unary_term ::= "-" unary_term | primary_term
 */
+
+// fn parse_unary_term(input: &str) -> IResult<&str, Expr>{
+
+// }
 
 /*
     primary_term ::= "(" expr ")" 
@@ -85,14 +114,23 @@ fn parse_mul_term(input: &str) -> IResult<&str, Expr>{
     | INT_LIT
 */
 
+// fn parse_primary_term(input: &str) -> IResult<&str, Expr>{
+
+// }
+
+fn parse_var(input: &str) -> IResult<&str, Expr>{
+    let (input, identifier) = eat_ws(parse_identifier)(input)?;
+    Ok((input, Expr::Var(identifier.to_string())))
+}
+
 // literals
 fn parse_int_literal(input: &str) -> IResult<&str, Expr>{
     let (input, digits) = take_while1(nom::AsChar::is_dec_digit)(input)?;
 
-    Ok((input, Statement::Expr(Expr::Int(i64::from_str(digits).unwrap()))))
+    Ok((input, Expr::Int(i64::from_str(digits).unwrap())))
 }
 
-fn parse_identifier(input: &str) -> IResult<&str, Expr>{
+fn parse_identifier(input: &str) -> IResult<&str, &str>{
     take_while1(nom::AsChar::is_alphanum)(input)
 }
 

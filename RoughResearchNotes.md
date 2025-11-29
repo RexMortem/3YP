@@ -8,3 +8,6 @@ Concept of existential variables from Verse is interesting (seems to be the same
 - Distinction between "sampling" operations and "combining" operations
 
 - LR parsing is more powerful (check power of LR vs LL)
+
+Random stuff:
+- Should probably check Rust style guide
