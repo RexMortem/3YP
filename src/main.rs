@@ -7,7 +7,7 @@ use parser::parse;
 mod ast;
 
 mod interpreter;
-use interpreter::print_statements;
+use interpreter::run;
 
 /*
     Entrypoint to the program: handles finding the file to interpret, 
@@ -28,7 +28,7 @@ fn main() {
     match contents {
         Ok(text) => {
             let statements = parse(&text);
-            print_statements(statements)
+            run(&statements)
         }
         Err(e) => {
             eprintln!("Error reading file '{}': {}", filename, e);

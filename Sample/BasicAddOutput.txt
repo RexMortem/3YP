@@ -1,1 +1,4 @@
-let aThing = 5 + 5 + 5;
+let aThing = 5 + 5 + 5 + 6 + 8;
+output(aThing);
+aThing = 15 + 5;
+output(aThing);

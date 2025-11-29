@@ -3,13 +3,12 @@ use std::str::FromStr;
 use nom::{
   IResult,
   Parser,
-  error::ParseError,
   sequence::{delimited, terminated, pair, preceded},
-  character::complete::multispace0,
-  bytes::complete::{tag, take_while1},
+  character::complete::{multispace0, satisfy},
+  bytes::complete::{tag, take_while, take_while1},
   multi::many0,
   branch::{alt},
-  combinator::{opt}
+  combinator::{opt, recognize, map}
 };
 
 use crate::ast::*;
@@ -33,7 +32,20 @@ fn parse_statement_list(input: &str) -> IResult<&str, Vec<Statement>>{
 }   
 
 fn parse_statement(input: &str) -> IResult<&str, Statement>{
-    alt((parse_var_declaration, parse_statement_assignment)).parse(input)
+    alt((parse_var_declaration, parse_statement_assignment, hardcoded_output)).parse(input)
+}
+
+/*
+    HERE FOR TESTING - will probably change implementation later
+*/
+fn hardcoded_output(input: &str) -> IResult<&str, Statement>{
+    let (input, expr_to_output) = delimited(
+        eat_ws(tag("output(")),
+        parse_expr,
+        eat_ws(tag(")"))
+    )(input)?;
+
+    Ok((input, Statement::HardcodedOutput(expr_to_output)))
 }
 
 fn parse_statement_assignment(input: &str) -> IResult<&str, Statement>{
@@ -70,7 +82,6 @@ fn parse_assignment(input: &str) -> IResult<&str, Expr>{
 
 /*
     expr (additive_term) ::= multiplicative_term (("+"|"-") multiplicative_term)*
-    multiplicative_term ::= unary_term (("*"|"/") unary_term)*
 */
 fn parse_expr(input: &str) -> IResult<&str, Expr>{
     let (input, first_mul) = eat_ws(parse_mul_term)(input)?;
@@ -96,17 +107,46 @@ fn parse_expr(input: &str) -> IResult<&str, Expr>{
     Ok((input, current_tail))
 }
 
+/*
+    multiplicative_term ::= unary_term (("*"|"/") unary_term)*
+*/
 fn parse_mul_term(input: &str) -> IResult<&str, Expr>{
-    eat_ws(parse_int_literal)(input)
+    let (input, first_unary) = eat_ws(parse_unary_term)(input)?;
+    let (input, mul_terms) = many0(pair(
+        alt((eat_ws(tag("*")), eat_ws(tag("/")))),
+        eat_ws(parse_unary_term))
+    )(input)?;
+
+    let mut current_tail: Expr = first_unary; 
+
+    for (operator, unary_term) in mul_terms {
+        match operator {
+            "*" => {
+                current_tail = Expr::Mul(Box::new(current_tail), Box::new(unary_term));
+            },
+            "/" => {
+                current_tail = Expr::Div(Box::new(current_tail), Box::new(unary_term));
+            },
+            _ => ()
+        }
+    }
+
+    Ok((input, current_tail))
 }
 
 /*
     unary_term ::= "-" unary_term | primary_term
 */
 
-// fn parse_unary_term(input: &str) -> IResult<&str, Expr>{
-
-// }
+fn parse_unary_term(input: &str) -> IResult<&str, Expr>{
+    alt((
+        map(
+            preceded(eat_ws(tag("-")), parse_unary_term),
+            |expr| Expr::Neg(Box::new(expr))
+        ),
+        parse_primary_term
+    )).parse(input)
+}
 
 /*
     primary_term ::= "(" expr ")" 
@@ -114,9 +154,17 @@ fn parse_mul_term(input: &str) -> IResult<&str, Expr>{
     | INT_LIT
 */
 
-// fn parse_primary_term(input: &str) -> IResult<&str, Expr>{
-
-// }
+fn parse_primary_term(input: &str) -> IResult<&str, Expr>{
+    alt((
+        delimited(
+            eat_ws(tag("(")),
+            parse_expr,
+            eat_ws(tag(")"))
+        ),
+        parse_var,
+        parse_int_literal
+    )).parse(input)
+}
 
 fn parse_var(input: &str) -> IResult<&str, Expr>{
     let (input, identifier) = eat_ws(parse_identifier)(input)?;
@@ -131,7 +179,10 @@ fn parse_int_literal(input: &str) -> IResult<&str, Expr>{
 }
 
 fn parse_identifier(input: &str) -> IResult<&str, &str>{
-    take_while1(nom::AsChar::is_alphanum)(input)
+    recognize(pair(
+        satisfy(nom::AsChar::is_alpha),
+        take_while(nom::AsChar::is_alphanum)
+    ))(input)
 }
 
 /*

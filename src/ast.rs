@@ -10,7 +10,8 @@ pub enum Statement {
     DeclAssign {
         name: Expr,
         value: Expr,
-    }
+    },
+    HardcodedOutput(Expr)
 }
 
 #[derive(Debug, Clone)]
@@ -52,8 +53,8 @@ impl fmt::Display for Statement {
         match self {
             Statement::DeclAssign { name, value } => write!(f, "let {} = {};", name, value),
             Statement::Decl(name) => write!(f, "let {};", name),
+            Statement::HardcodedOutput(expr) => write!(f, "output({});", expr),
             Statement::Assign { name, value } => write!(f, "{} = {};", name, value),
         }
     }
 }
-
