@@ -1,14 +1,18 @@
 use std::collections::HashMap;
+use rand::Rng;
+
 use crate::ast::*;
 
 struct RuntimeEnv {
     vars: HashMap<String, i64>, // just testing on ints for now
+    dists: HashMap<String, Dist>
 }
 
 impl RuntimeEnv {
     fn new() -> Self {
         RuntimeEnv { 
-            vars: HashMap::new()
+            vars: HashMap::new(),
+            dists: HashMap::new()
         }
     }
 
@@ -21,6 +25,11 @@ impl RuntimeEnv {
                     .unwrap_or_else(|| panic!("Undefined variable: {}", name))
             }
 
+            Expr::FuncCall(name, args) => {
+                let eval_args: Vec<i64> = args.iter().map(|e| self.eval_expr(e)).collect();
+                self.eval_func_call(name, &eval_args)
+            }
+            
             Expr::Neg(inner) => -self.eval_expr(inner),
 
             Expr::Add(a, b) => self.eval_expr(a) + self.eval_expr(b),

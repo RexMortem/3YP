@@ -1,6 +1,19 @@
 use std::fmt;
 
 #[derive(Debug, Clone)]
+pub enum Dist {
+    Uniform(i64, i64),
+}
+
+#[derive(Debug, Clone)]
+pub enum Exp_Value<T> {
+    Exp_Value {
+        val: T,
+        cL: f64 // confidence level e.g. 0.2 for 20%
+    }
+}
+
+#[derive(Debug, Clone)]
 pub enum Statement {
     Decl(Expr),
     Assign {
@@ -18,6 +31,7 @@ pub enum Statement {
 pub enum Expr {
     Int(i64),
     Var(String),
+    FuncCall(String, Vec<Expr>),
 
     // unary
     Neg(Box<Expr>),
