@@ -3,8 +3,9 @@
 program ::= statementList
 statementList ::= statement ";" statementList | epsilon
 
-statement ::= var_declaration | statement_assignment
+statement ::= var_declaration | statement_assignment | hardcoded_output # hardcoded_output temp
 statement_assignment ::= var assignment
+hardcoded_output = "output(" expr ")"
 
 var_declaration ::= "let" var var_declaration_prime
 var_declaration_prime ::= assignment | epsilon
@@ -17,7 +18,7 @@ res_type ::= "int" # only int for now
 
 assignment ::= "=" expr 
 
-expr ::= additive_term # need to extend this to bool operators later
+expr ::= additive_term | dist_inst # need to extend this to bool operators later
 
 additive_term ::= multiplicative_term (("+"|"-") multiplicative_term)*
 multiplicative_term ::= unary_term (("*"|"/") unary_term)*
@@ -25,5 +26,16 @@ multiplicative_term ::= unary_term (("*"|"/") unary_term)*
 unary_term ::= "-" unary_term | primary_term
 
 primary_term ::= "(" expr ")" 
-    | VAR_NAME
+    | var_usage
     | INT_LIT
+
+var_usage = VAR_NAME opt_fun_call
+opt_fun_call = ":" VAR_NAME "(" arg_list ")" | epsilon
+
+dist_inst = DIST_NAME "(" arg_list ")"
+
+arg_list = arg ("," arg)* | epsilon
+arg = expr 
+
+param_list = param ("," param)* | epsilon 
+param = VAR_NAME
