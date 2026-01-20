@@ -31,7 +31,7 @@ pub enum Statement {
 pub enum Expr {
     Int(i64),
     Var(String),
-    FuncCall(String, Vec<Expr>),
+    // FuncCall(String, Vec<Expr>),
 
     // unary
     Neg(Box<Expr>),

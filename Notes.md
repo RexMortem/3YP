@@ -11,3 +11,12 @@ Concept of existential variables from Verse is interesting (seems to be the same
 
 Random stuff:
 - Should probably check Rust style guide
+
+Questions to ask:
+- lots of type interactions - what about representing an absolute int as cL of 1
+
+Progress Report:
+- Biggest thing is that it proves that I understand my project very well; so expand on future of project thoroughly 
+- lots of images/code
+- Syntax and semantics that don't exist but are planning to be implemented
+- markers for success: which algorithms to be able to write

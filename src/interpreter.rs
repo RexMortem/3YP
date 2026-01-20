@@ -25,10 +25,10 @@ impl RuntimeEnv {
                     .unwrap_or_else(|| panic!("Undefined variable: {}", name))
             }
 
-            Expr::FuncCall(name, args) => {
-                let eval_args: Vec<i64> = args.iter().map(|e| self.eval_expr(e)).collect();
-                self.eval_func_call(name, &eval_args)
-            }
+            // Expr::FuncCall(name, args) => {
+            //     let eval_args: Vec<i64> = args.iter().map(|e| self.eval_expr(e)).collect();
+            //     self.eval_func_call(name, &eval_args)
+            // }
             
             Expr::Neg(inner) => -self.eval_expr(inner),
 
