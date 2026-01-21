@@ -75,10 +75,39 @@ fn parse_var_declaration(input: &str) -> IResult<&str, Statement>{
 }
 
 fn parse_assignment(input: &str) -> IResult<&str, Expr>{
-    preceded(eat_ws(tag("=")), eat_ws(parse_expr))(input)
+    preceded(eat_ws(tag("=")), eat_ws(parse_expr_head))(input)
 }
 
 // expression parsing
+
+/*
+    arg_list = arg ("," arg)* | epsilon
+*/
+fn parse_arg_list(input: &str) -> -> IResult<&str, Vec<Expr>>{
+    let (input, first_expr) = eat_ws(parse_expr)(input)?;
+    let (input, expr_terms) = many0(terminated(parse_expr, eat_ws(tag(","))))(input)?;
+    expr_terms.insert(0, first_expr);
+
+    Ok((input, expr_terms))
+}
+
+/*
+    expr ::= additive_term | dist_inst
+*/
+fn parse_expr_head(input: &str) -> IResult<&str, Expr>{
+    alt(parse_expr, parse_dist_inst).parse(input)
+}
+
+fn parse_dist_inst(input: &str) -> IResult<&str, Expr>{
+    
+    // alt((
+    //     delimited(
+    //         eat_ws(tag("(")),
+    //         parse_expr,
+    //         eat_ws(tag(")"))
+    //     ),
+    // )).parse(input)
+}
 
 /*
     expr (additive_term) ::= multiplicative_term (("+"|"-") multiplicative_term)*

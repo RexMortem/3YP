@@ -1,0 +1,2 @@
+let diceRoll = uniform(1,6);
+let twoRoll = diceRoll + diceRoll;

@@ -1,4 +1,3 @@
 let aDist = uniform(1,9);
-let x = aDist:expect(5);
-let y = x + x;
-output(y);
+let cl = aDist:expect(5);
+output(cl);

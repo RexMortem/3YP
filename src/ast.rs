@@ -2,16 +2,17 @@ use std::fmt;
 
 #[derive(Debug, Clone)]
 pub enum Dist {
-    Uniform(i64, i64),
+    Uniform(i64, i64), // start, end
+    ChainDist(Dist, u64, Dist), // current distribution, number of iterations, the distribution to join onto
 }
 
-#[derive(Debug, Clone)]
-pub enum Exp_Value<T> {
-    Exp_Value {
-        val: T,
-        cL: f64 // confidence level e.g. 0.2 for 20%
-    }
-}
+// #[derive(Debug, Clone)]
+// pub enum Exp_Value<T> {
+//     Exp_Value {
+//         val: T,
+       
+//     }
+// }
 
 #[derive(Debug, Clone)]
 pub enum Statement {

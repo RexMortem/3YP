@@ -20,3 +20,17 @@ Progress Report:
 - lots of images/code
 - Syntax and semantics that don't exist but are planning to be implemented
 - markers for success: which algorithms to be able to write
+- argument for using a language - language-independence
+
+Extensions:
+- Could move parsing distribution literals to where int_lit is, to allow for expressions like `let x = 5 * (3 + uniform(1,9))`
+- Distributions for more types (other than int literals)
+- Add better debugging information
+
+Test:
+- performance of LinkedList chaining in language vs ArrayListing a pair
+- pushing element to front of list doesn't feel right
+
+https://www.ibm.com/think/topics/monte-carlo-simulation
+https://www.cs.cmu.edu/afs/cs/academic/class/15451-s07/www/lecture_notes/lect0123.pdf
+https://probabilistic-programming.org/
