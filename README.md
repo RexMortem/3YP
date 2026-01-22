@@ -16,7 +16,7 @@ You can either obtain an `exe` of the most recent release of the project from th
 You should have an executable or program of some sort at this stage. If you are using an executable, test by running:
 
 ```
-./path-to-exe Sample/MulAddOutput.txt
+./path-to-exe Sample/Passing/MulAddOutput.txt
 ```
 
 This should run the interpreter on a simple example of a syntactically and semantically correct YAPPL program.
