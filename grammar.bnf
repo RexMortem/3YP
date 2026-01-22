@@ -1,9 +1,8 @@
-# entry-point into grammar (will probably have to refactor when introducing functions, loops etc.)
-# may also have to refactor grammar to put ";" at different levels to provide better error messages
+# entry-point into grammar (will probably have to refactor if complicated structures to be introduced e.g. loops, functions etc.)
 program ::= statementList
 statementList ::= statement ";" statementList | epsilon
 
-statement ::= var_declaration | statement_assignment | hardcoded_output # hardcoded_output temp
+statement ::= var_declaration | statement_assignment | hardcoded_output # unlikely that primitive functions like hardcoded_output will be implemented this way in final product
 statement_assignment ::= var assignment
 hardcoded_output = "output(" expr ")"
 
@@ -12,13 +11,14 @@ var_declaration_prime ::= assignment | epsilon
 
 var ::= ("dist" dist_type | "res" res_type) VAR_NAME
 
-dist_type ::= "uniform" # only implementing uniform for now
+dist_type ::= "uniform" # only uniform distribution for now
 
-res_type ::= "int" # only int for now
+res_type ::= "int" # only ints as a value type for now
 
 assignment ::= "=" expr 
 
-expr ::= additive_term | dist_inst # need to extend this to bool operators later
+expr ::= additive_term | dist_inst 
+dist_inst = dist_type "(" arg_list ")"
 
 additive_term ::= multiplicative_term (("+"|"-") multiplicative_term)*
 multiplicative_term ::= unary_term (("*"|"/") unary_term)*
