@@ -1,0 +1,5 @@
+let aDist = uniform(1,9) * 3;
+let anotherDist = aDist + aDist + aDist;
+let x,cl = aDist:expect(5);
+output(x);
+output(cl);

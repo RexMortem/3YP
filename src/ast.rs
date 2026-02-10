@@ -3,7 +3,8 @@ use std::fmt;
 #[derive(Debug, Clone)]
 pub enum Dist {
     Uniform(i64, i64), // start, end
-    ChainDist(Dist, u64, Dist), // current distribution, number of iterations, the distribution to join onto
+    ChainDist(Box<Dist>, u64, Box<Dist>), // current distribution, number of iterations, the distribution to join onto
+    // BranchDist()
 }
 
 // #[derive(Debug, Clone)]
@@ -42,6 +43,14 @@ pub enum Expr {
     Sub(Box<Expr>, Box<Expr>),
     Mul(Box<Expr>, Box<Expr>),
     Div(Box<Expr>, Box<Expr>),
+
+    // distributions
+    Dist(Dist),
+    DistMethodCall {
+        var: String,
+        method: String,
+        args: Vec<Expr>,
+    },
 }
 
 // functionality for enums
@@ -59,7 +68,25 @@ impl fmt::Display for Expr {
             Expr::Mul(lhs, rhs) => write!(f, "({} * {})", lhs, rhs),
             Expr::Div(lhs, rhs) => write!(f, "({} / {})", lhs, rhs),
             Expr::Neg(inner) => write!(f, "-{}", inner),
+            Expr::Dist(dist) => write!(f, "{}", format_dist(dist)),
+            Expr::DistMethodCall { var, method, args } => {
+                write!(f, "{}:{}(", var, method)?;
+                for (i, arg) in args.iter().enumerate() {
+                    if i > 0 {
+                        write!(f, ", ")?;
+                    }
+                    write!(f, "{}", arg)?;
+                }
+                write!(f, ")")
+            }
         }
+    }
+}
+
+fn format_dist(dist: &Dist) -> String {
+    match dist {
+        Dist::Uniform(a, b) => format!("uniform({}, {})", a, b),
+        Dist::ChainDist(d1, n, d2) => format!("{}[{}]{}", format_dist(d1), n, format_dist(d2)),
     }
 }
 
@@ -73,3 +100,4 @@ impl fmt::Display for Statement {
         }
     }
 }
+

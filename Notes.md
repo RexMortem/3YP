@@ -30,7 +30,20 @@ Extensions:
 Test:
 - performance of LinkedList chaining in language vs ArrayListing a pair
 - pushing element to front of list doesn't feel right
+- pratt parsing for expressions
+
+
+AI for test-cases
+Rust QuickCheck
+Dist property tests
+Single-Step Semantics 
+Ooperational Semantics more useful
+Constant distribution 
+Weighting constructor
+
+Normal, alpha dist, gamma dist, beta dist, discrete uniform/continuous uniform 
 
 https://www.ibm.com/think/topics/monte-carlo-simulation
 https://www.cs.cmu.edu/afs/cs/academic/class/15451-s07/www/lecture_notes/lect0123.pdf
 https://probabilistic-programming.org/
+

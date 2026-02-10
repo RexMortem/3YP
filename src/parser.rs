@@ -83,31 +83,33 @@ fn parse_assignment(input: &str) -> IResult<&str, Expr>{
 /*
     arg_list = arg ("," arg)* | epsilon
 */
-fn parse_arg_list(input: &str) -> -> IResult<&str, Vec<Expr>>{
+fn parse_arg_list(input: &str) -> IResult<&str, Vec<Expr>>{
     let (input, first_expr) = eat_ws(parse_expr)(input)?;
-    let (input, expr_terms) = many0(terminated(parse_expr, eat_ws(tag(","))))(input)?;
-    expr_terms.insert(0, first_expr);
+    let (input, rest_args) = many0(
+        preceded(
+            eat_ws(tag(",")),
+            eat_ws(parse_expr)
+        )
+    )(input)?;
 
-    Ok((input, expr_terms))
+    let mut args = vec![first_expr];
+    args.extend(rest_args);
+    Ok((input, args))
+}
+
+fn parse_arg_list_optional(input: &str) -> IResult<&str, Vec<Expr>>{
+    opt(parse_arg_list)(input).map(|(input, maybe_args)| {
+        (input, maybe_args.unwrap_or_default())
+    })
 }
 
 /*
     expr ::= additive_term | dist_inst
 */
 fn parse_expr_head(input: &str) -> IResult<&str, Expr>{
-    alt(parse_expr, parse_dist_inst).parse(input)
+    parse_expr(input)
 }
 
-fn parse_dist_inst(input: &str) -> IResult<&str, Expr>{
-    
-    // alt((
-    //     delimited(
-    //         eat_ws(tag("(")),
-    //         parse_expr,
-    //         eat_ws(tag(")"))
-    //     ),
-    // )).parse(input)
-}
 
 /*
     expr (additive_term) ::= multiplicative_term (("+"|"-") multiplicative_term)*
@@ -190,14 +192,61 @@ fn parse_primary_term(input: &str) -> IResult<&str, Expr>{
             parse_expr,
             eat_ws(tag(")"))
         ),
+        parse_func_call,
         parse_var,
         parse_int_literal
     )).parse(input)
 }
 
+fn parse_func_call(input: &str) -> IResult<&str, Expr>{
+    let (input, func_name) = eat_ws(parse_identifier)(input)?;
+    let (input, _) = eat_ws(tag("("))(input)?;
+    let (input, args) = parse_arg_list_optional(input)?;
+    let (input, _) = eat_ws(tag(")"))(input)?;
+
+    // Check if this is a known distribution
+    match func_name {
+        "uniform" => {
+            if args.len() != 2 {
+                return Err(nom::Err::Error(nom::error::Error::new(input, nom::error::ErrorKind::Count)));
+            }
+            match (&args[0], &args[1]) {
+                (Expr::Int(a), Expr::Int(b)) => Ok((input, Expr::Dist(Dist::Uniform(*a, *b)))),
+                _ => Err(nom::Err::Error(nom::error::Error::new(input, nom::error::ErrorKind::Verify))),
+            }
+        },
+        _ => Err(nom::Err::Error(nom::error::Error::new(input, nom::error::ErrorKind::Tag))),
+    }
+}
+
 fn parse_var(input: &str) -> IResult<&str, Expr>{
     let (input, identifier) = eat_ws(parse_identifier)(input)?;
-    Ok((input, Expr::Var(identifier.to_string())))
+    let (input, opt_method_call) = opt(parse_method_call)(input)?;
+
+    match opt_method_call {
+        Some((method_name, args)) => {
+            Ok((input, Expr::DistMethodCall {
+                var: identifier.to_string(),
+                method: method_name,
+                args,
+            }))
+        },
+        None => {
+            Ok((input, Expr::Var(identifier.to_string())))
+        }
+    }
+}
+
+fn parse_method_call(input: &str) -> IResult<&str, (String, Vec<Expr>)>{
+    let (input, _) = eat_ws(tag(":"))(input)?;
+    let (input, method_name) = eat_ws(parse_identifier)(input)?;
+    let (input, args) = delimited(
+        eat_ws(tag("(")),
+        parse_arg_list_optional,
+        eat_ws(tag(")"))
+    )(input)?;
+
+    Ok((input, (method_name.to_string(), args)))
 }
 
 // literals

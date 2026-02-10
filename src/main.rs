@@ -10,7 +10,7 @@ mod interpreter;
 use interpreter::run;
 
 /*
-    Entrypoint to the program: handles finding the file to interpret, 
+    Entrypoint to the program: handles finding the file to interpret,
     converts it to a string,
     then hands it off to the parser.
 */
@@ -35,4 +35,9 @@ fn main() {
             return;
         }
     }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
 }
