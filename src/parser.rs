@@ -81,6 +81,38 @@ fn parse_assignment(input: &str) -> IResult<&str, Expr>{
 // expression parsing
 
 /*
+    pair_list = pair ("," pair)* | epsilon
+    pair = expr ":" expr
+*/
+fn parse_discrete_pair(input: &str) -> IResult<&str, (Box<Expr>, Box<Expr>)>{
+    let (input, key) = eat_ws(parse_expr)(input)?;
+    let (input, _) = eat_ws(tag(":"))(input)?;
+    let (input, value) = eat_ws(parse_expr)(input)?;
+
+    Ok((input, (Box::new(key), Box::new(value))))
+}
+
+fn parse_discrete_pair_list(input: &str) -> IResult<&str, Vec<(Box<Expr>, Box<Expr>)>>{
+    let (input, first_pair) = eat_ws(parse_discrete_pair)(input)?;
+    let (input, rest_pairs) = many0(
+        preceded(
+            eat_ws(tag(",")),
+            eat_ws(parse_discrete_pair)
+        )
+    )(input)?;
+
+    let mut pairs = vec![first_pair];
+    pairs.extend(rest_pairs);
+    Ok((input, pairs))
+}
+
+fn parse_discrete_pair_list_optional(input: &str) -> IResult<&str, Vec<(Box<Expr>, Box<Expr>)>>{
+    opt(parse_discrete_pair_list)(input).map(|(input, maybe_pairs)| {
+        (input, maybe_pairs.unwrap_or_default())
+    })
+}
+
+/*
     arg_list = arg ("," arg)* | epsilon
 */
 fn parse_arg_list(input: &str) -> IResult<&str, Vec<Expr>>{
@@ -201,16 +233,24 @@ fn parse_primary_term(input: &str) -> IResult<&str, Expr>{
 fn parse_func_call(input: &str) -> IResult<&str, Expr>{
     let (input, func_name) = eat_ws(parse_identifier)(input)?;
     let (input, _) = eat_ws(tag("("))(input)?;
-    let (input, args) = parse_arg_list_optional(input)?;
-    let (input, _) = eat_ws(tag(")"))(input)?;
 
     // Check if this is a known distribution
     match func_name {
         "uniform" => {
+            let (input, args) = parse_arg_list_optional(input)?;
+            let (input, _) = eat_ws(tag(")"))(input)?;
             if args.len() != 2 {
                 return Err(nom::Err::Error(nom::error::Error::new(input, nom::error::ErrorKind::Count)));
             }
             Ok((input, Expr::Dist(Dist::Uniform(Box::new(args[0].clone()), Box::new(args[1].clone())))))
+        },
+        "Discrete" => {
+            let (input, pairs) = parse_discrete_pair_list_optional(input)?;
+            let (input, _) = eat_ws(tag(")"))(input)?;
+            if pairs.is_empty() {
+                return Err(nom::Err::Error(nom::error::Error::new(input, nom::error::ErrorKind::Count)));
+            }
+            Ok((input, Expr::Dist(Dist::Discrete(pairs))))
         },
         _ => Err(nom::Err::Error(nom::error::Error::new(input, nom::error::ErrorKind::Tag))),
     }
@@ -251,10 +291,27 @@ fn parse_int_literal(input: &str) -> IResult<&str, Expr>{
     let (input, maybe_neg) = opt(eat_ws(tag("-")))(input)?;
     let (input, digits) = take_while1(nom::AsChar::is_dec_digit)(input)?;
 
-    let num = i64::from_str(digits).unwrap();
-    let final_num = if maybe_neg.is_some() { -num } else { num };
+    // Check if this is a float (has a decimal point)
+    let (input, maybe_decimal) = opt(pair(
+        tag("."),
+        take_while1(nom::AsChar::is_dec_digit)
+    ))(input)?;
 
-    Ok((input, Expr::Int(final_num)))
+    if let Some((_, decimal_digits)) = maybe_decimal {
+        // Parse as float
+        let num_str = format!("{}{}.{}",
+            if maybe_neg.is_some() { "-" } else { "" },
+            digits,
+            decimal_digits
+        );
+        let num = f64::from_str(&num_str).unwrap();
+        Ok((input, Expr::Float(num)))
+    } else {
+        // Parse as integer
+        let num = i64::from_str(digits).unwrap();
+        let final_num = if maybe_neg.is_some() { -num } else { num };
+        Ok((input, Expr::Int(final_num)))
+    }
 }
 
 fn parse_identifier(input: &str) -> IResult<&str, &str>{

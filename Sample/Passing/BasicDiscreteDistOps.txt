@@ -1,0 +1,35 @@
+let BiasedDie = Discrete(
+    1:0.1,
+    2:0.2,
+    3:0.3,
+    4:0.2,
+    5:0.1,
+    6:0.1
+);
+
+let TwoDie = BiasedDie + BiasedDie;
+output(TwoDie:expect(2));
+output(TwoDie:expect(3));
+output(TwoDie:expect(4));
+output(TwoDie:expect(5));
+output(TwoDie:expect(6));
+output(TwoDie:expect(7));
+output(TwoDie:expect(8));
+output(TwoDie:expect(9));
+output(TwoDie:expect(10));
+output(TwoDie:expect(11));
+output(TwoDie:expect(12));
+
+output(
+    TwoDie:expect(2) +
+    TwoDie:expect(3) +
+    TwoDie:expect(4) +
+    TwoDie:expect(5) +
+    TwoDie:expect(6) +
+    TwoDie:expect(7) +
+    TwoDie:expect(8) +
+    TwoDie:expect(9) +
+    TwoDie:expect(10) +
+    TwoDie:expect(11) +
+    TwoDie:expect(12)
+);

@@ -1,0 +1,11 @@
+let BiasedDie = Discrete(
+    1:0.1,
+    2:0.2,
+    3:0.3,
+    4:0.2,
+    5:0.1,
+    6:0.1
+);
+
+let cl = BiasedDie:expect(2);
+output(cl);

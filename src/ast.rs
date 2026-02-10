@@ -3,6 +3,8 @@ use std::fmt;
 #[derive(Debug, Clone)]
 pub enum Dist {
     Uniform(Box<Expr>, Box<Expr>), // start, end
+    Discrete(Vec<(Box<Expr>, Box<Expr>)>), // value:probability pairs
+    CombinedDist(Box<Dist>, Box<Dist>), // combining two distributions by summing outcomes
     ChainDist(Box<Dist>, u64, Box<Dist>), // current distribution, number of iterations, the distribution to join onto
     // BranchDist()
 }
@@ -32,6 +34,7 @@ pub enum Statement {
 #[derive(Debug, Clone)]
 pub enum Expr {
     Int(i64),
+    Float(f64),
     Var(String),
     // FuncCall(String, Vec<Expr>),
 
@@ -62,6 +65,7 @@ impl fmt::Display for Expr {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         match self {
             Expr::Int(i) => write!(f, "{}", i),
+            Expr::Float(fl) => write!(f, "{}", fl),
             Expr::Var(name) => write!(f, "{}", name),
             Expr::Add(lhs, rhs) => write!(f, "({} + {})", lhs, rhs),
             Expr::Sub(lhs, rhs) => write!(f, "({} - {})", lhs, rhs),
@@ -86,6 +90,13 @@ impl fmt::Display for Expr {
 fn format_dist(dist: &Dist) -> String {
     match dist {
         Dist::Uniform(a, b) => format!("uniform({}, {})", a, b),
+        Dist::Discrete(pairs) => {
+            let pair_strs: Vec<String> = pairs.iter()
+                .map(|(value, prob)| format!("{}:{}", value, prob))
+                .collect();
+            format!("Discrete({})", pair_strs.join(", "))
+        }
+        Dist::CombinedDist(d1, d2) => format!("({} + {})", format_dist(d1), format_dist(d2)),
         Dist::ChainDist(d1, n, d2) => format!("{}[{}]{}", format_dist(d1), n, format_dist(d2)),
     }
 }
