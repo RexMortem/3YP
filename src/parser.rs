@@ -210,10 +210,7 @@ fn parse_func_call(input: &str) -> IResult<&str, Expr>{
             if args.len() != 2 {
                 return Err(nom::Err::Error(nom::error::Error::new(input, nom::error::ErrorKind::Count)));
             }
-            match (&args[0], &args[1]) {
-                (Expr::Int(a), Expr::Int(b)) => Ok((input, Expr::Dist(Dist::Uniform(*a, *b)))),
-                _ => Err(nom::Err::Error(nom::error::Error::new(input, nom::error::ErrorKind::Verify))),
-            }
+            Ok((input, Expr::Dist(Dist::Uniform(Box::new(args[0].clone()), Box::new(args[1].clone())))))
         },
         _ => Err(nom::Err::Error(nom::error::Error::new(input, nom::error::ErrorKind::Tag))),
     }
@@ -251,9 +248,13 @@ fn parse_method_call(input: &str) -> IResult<&str, (String, Vec<Expr>)>{
 
 // literals
 fn parse_int_literal(input: &str) -> IResult<&str, Expr>{
+    let (input, maybe_neg) = opt(eat_ws(tag("-")))(input)?;
     let (input, digits) = take_while1(nom::AsChar::is_dec_digit)(input)?;
 
-    Ok((input, Expr::Int(i64::from_str(digits).unwrap())))
+    let num = i64::from_str(digits).unwrap();
+    let final_num = if maybe_neg.is_some() { -num } else { num };
+
+    Ok((input, Expr::Int(final_num)))
 }
 
 fn parse_identifier(input: &str) -> IResult<&str, &str>{

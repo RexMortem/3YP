@@ -1,0 +1,3 @@
+let diceRoll = uniform(1+5,15);
+let cl = diceRoll:expect(4*3);
+output(cl);

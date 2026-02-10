@@ -1,0 +1,3 @@
+let diceRoll = uniform(1,6);
+let twoRolls = diceRoll + diceRoll;
+let cl = twoRolls:expect();

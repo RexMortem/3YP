@@ -2,7 +2,7 @@ use std::fmt;
 
 #[derive(Debug, Clone)]
 pub enum Dist {
-    Uniform(i64, i64), // start, end
+    Uniform(Box<Expr>, Box<Expr>), // start, end
     ChainDist(Box<Dist>, u64, Box<Dist>), // current distribution, number of iterations, the distribution to join onto
     // BranchDist()
 }

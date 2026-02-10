@@ -114,20 +114,24 @@ impl RuntimeEnv {
                 if args.len() != 1 {
                     panic!("expect method requires exactly 1 argument");
                 }
-                if let Expr::Int(_expected) = args[0] {
-                    // Calculate probability of getting the expected value
-                    match dist {
-                        Dist::Uniform(a, b) => {
-                            // For a uniform distribution, probability = 1 / (num_values)
-                            let num_values = (b - a + 1) as f64;
-                            1.0 / num_values
-                        },
-                        Dist::ChainDist(_, _, _) => {
-                            panic!("ChainDist probability calculation not yet implemented");
+                let expected = self.eval_expr(&args[0]) as i64;
+                // Calculate probability of getting the expected value
+                match dist {
+                    Dist::Uniform(a_expr, b_expr) => {
+                        // Evaluate the bound expressions
+                        let a = self.eval_expr(a_expr) as i64;
+                        let b = self.eval_expr(b_expr) as i64;
+                        // Check if expected value is within range
+                        if expected < a || expected > b {
+                            return 0.0;
                         }
+                        // For a uniform distribution, probability = 1 / (num_values)
+                        let num_values = (b - a + 1) as f64;
+                        1.0 / num_values
+                    },
+                    Dist::ChainDist(_, _, _) => {
+                        panic!("ChainDist probability calculation not yet implemented");
                     }
-                } else {
-                    panic!("expect method argument must be an integer");
                 }
             }
             _ => panic!("Unknown distribution method: {}", method),
