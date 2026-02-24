@@ -2,7 +2,8 @@ use std::fmt;
 
 #[derive(Debug, Clone)]
 pub enum Dist {
-    Uniform(Box<Expr>, Box<Expr>), // start, end
+    Uniform(Box<Expr>, Box<Expr>), // start, end (discrete)
+    UniformContinuous(Box<Expr>, Box<Expr>), // start, end (continuous)
     Discrete(Vec<(Box<Expr>, Box<Expr>)>), // value:probability pairs
     CombinedDist(Box<Dist>, Box<Dist>), // combining two distributions by summing outcomes
     ChainDist(Box<Dist>, u64, Box<Dist>), // current distribution, number of iterations, the distribution to join onto
@@ -90,6 +91,7 @@ impl fmt::Display for Expr {
 fn format_dist(dist: &Dist) -> String {
     match dist {
         Dist::Uniform(a, b) => format!("uniform({}, {})", a, b),
+        Dist::UniformContinuous(a, b) => format!("uniformContinuous({}, {})", a, b),
         Dist::Discrete(pairs) => {
             let pair_strs: Vec<String> = pairs.iter()
                 .map(|(value, prob)| format!("{}:{}", value, prob))

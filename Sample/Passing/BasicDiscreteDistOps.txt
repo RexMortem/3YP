@@ -20,6 +20,8 @@ output(TwoDie:expect(10));
 output(TwoDie:expect(11));
 output(TwoDie:expect(12));
 
+output(TwoDie:expect(-1));
+
 output(
     TwoDie:expect(2) +
     TwoDie:expect(3) +

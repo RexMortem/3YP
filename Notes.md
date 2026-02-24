@@ -33,6 +33,7 @@ Test:
 - pratt parsing for expressions
 
 
+
 AI for test-cases
 Rust QuickCheck
 Dist property tests
@@ -40,6 +41,12 @@ Single-Step Semantics
 Ooperational Semantics more useful
 Constant distribution 
 Weighting constructor
+
+To add:
+- Useful errors and checks 
+- Duplicate errors
+- Test harness
+- Fraction crate
 
 Normal, alpha dist, gamma dist, beta dist, discrete uniform/continuous uniform 
 

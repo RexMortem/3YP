@@ -1,0 +1,7 @@
+let continuousDist = uniformContinuous(0, 5);
+let minVal = continuousDist:min();
+let maxVal = continuousDist:max();
+let meanVal = continuousDist:mean();
+output(minVal);
+output(maxVal);
+output(meanVal);

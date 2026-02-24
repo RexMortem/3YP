@@ -244,6 +244,14 @@ fn parse_func_call(input: &str) -> IResult<&str, Expr>{
             }
             Ok((input, Expr::Dist(Dist::Uniform(Box::new(args[0].clone()), Box::new(args[1].clone())))))
         },
+        "uniformContinuous" => {
+            let (input, args) = parse_arg_list_optional(input)?;
+            let (input, _) = eat_ws(tag(")"))(input)?;
+            if args.len() != 2 {
+                return Err(nom::Err::Error(nom::error::Error::new(input, nom::error::ErrorKind::Count)));
+            }
+            Ok((input, Expr::Dist(Dist::UniformContinuous(Box::new(args[0].clone()), Box::new(args[1].clone())))))
+        },
         "Discrete" => {
             let (input, pairs) = parse_discrete_pair_list_optional(input)?;
             let (input, _) = eat_ws(tag(")"))(input)?;

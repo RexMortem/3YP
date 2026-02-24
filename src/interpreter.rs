@@ -152,6 +152,9 @@ impl RuntimeEnv {
                         let num_values = (b - a + 1) as f64;
                         1.0 / num_values
                     },
+                    Dist::UniformContinuous(_, _) => {
+                        panic!("expect method is not supported for continuous distributions");
+                    },
                     Dist::Discrete(pairs) => {
                         // Look for the expected value in the pairs
                         for (value_expr, prob_expr) in pairs {
@@ -184,6 +187,37 @@ impl RuntimeEnv {
                     }
                 }
             }
+            "min" => {
+                match dist {
+                    Dist::Uniform(a_expr, _) | Dist::UniformContinuous(a_expr, _) => {
+                        self.eval_expr(a_expr)
+                    },
+                    _ => panic!("min method is only supported for uniform distributions"),
+                }
+            }
+            "max" => {
+                match dist {
+                    Dist::Uniform(_, b_expr) | Dist::UniformContinuous(_, b_expr) => {
+                        self.eval_expr(b_expr)
+                    },
+                    _ => panic!("max method is only supported for uniform distributions"),
+                }
+            }
+            "mean" => {
+                match dist {
+                    Dist::Uniform(a_expr, b_expr) => {
+                        let a = self.eval_expr(a_expr);
+                        let b = self.eval_expr(b_expr);
+                        (a + b) / 2.0
+                    },
+                    Dist::UniformContinuous(a_expr, b_expr) => {
+                        let a = self.eval_expr(a_expr);
+                        let b = self.eval_expr(b_expr);
+                        (a + b) / 2.0
+                    },
+                    _ => panic!("mean method is only supported for uniform distributions"),
+                }
+            }
             _ => panic!("Unknown distribution method: {}", method),
         }
     }
@@ -196,6 +230,9 @@ impl RuntimeEnv {
                 let num_values = (b - a + 1) as f64;
                 let prob = 1.0 / num_values;
                 (a..=b).map(|val| (val, prob)).collect()
+            },
+            Dist::UniformContinuous(_, _) => {
+                panic!("Continuous distributions cannot be combined with other distributions");
             },
             Dist::Discrete(pairs) => {
                 pairs.iter().map(|(val_expr, prob_expr)| {
