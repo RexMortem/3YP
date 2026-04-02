@@ -4,14 +4,16 @@ use crate::ast::*;
 
 struct RuntimeEnv {
     vars: HashMap<String, f64>, // changed to f64 to support floating-point probabilities
-    dists: HashMap<String, Dist>
+    dists: HashMap<String, Dist>,
+    output: Vec<String>,
 }
 
 impl RuntimeEnv {
     fn new() -> Self {
-        RuntimeEnv { 
+        RuntimeEnv {
             vars: HashMap::new(),
-            dists: HashMap::new()
+            dists: HashMap::new(),
+            output: Vec::new(),
         }
     }
 
@@ -118,12 +120,13 @@ impl RuntimeEnv {
 
             Statement::HardcodedOutput(expr) => {
                 let v = self.eval_expr(expr);
-                // Print with appropriate precision for floating-point numbers
-                if v.fract() == 0.0 {
-                    println!("{}", v as i64);
+                // Format with appropriate precision for floating-point numbers
+                let line = if v.fract() == 0.0 {
+                    format!("{}", v as i64)
                 } else {
-                    println!("{}", v);
-                }
+                    format!("{}", v)
+                };
+                self.output.push(line);
             }
         }
     }
@@ -270,8 +273,18 @@ pub fn print_statements(statement_list: Vec<Statement>){
 
 pub fn run(stmts: &[Statement]) {
     let mut env = RuntimeEnv::new();
-
     for stmt in stmts {
         env.exec_stmt(stmt);
     }
+    for line in &env.output {
+        println!("{}", line);
+    }
+}
+
+pub fn run_to_string(stmts: &[Statement]) -> String {
+    let mut env = RuntimeEnv::new();
+    for stmt in stmts {
+        env.exec_stmt(stmt);
+    }
+    env.output.join("\n")
 }

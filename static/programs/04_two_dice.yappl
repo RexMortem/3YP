@@ -1,0 +1,5 @@
+let d1 = uniform(1, 6);
+let d2 = uniform(1, 6);
+let two_dice = d1 + d2;
+let prob7 = two_dice:expect(7);
+output(prob7);

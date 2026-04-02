@@ -1,6 +1,23 @@
 # 3YP
 Third Year Project: Yet Another Probabilistic Programming Language (YAPPL). 
 
+## Trying the Project
+
+If you don't want to build and run the project, you should be able to play around with the language at 
+
+## Locally Testing the Project
+
+For targeting a specific file:
+```
+cargo run 
+```
+
+For running the web interface locally:
+```
+cargo run -- --web
+```
+And then visit `http://localhost:8080`.
+
 ## Building Instructions
 
 You can either obtain an `exe` of the most recent release of the project from the GitHub page, or you can build your own with Rust and Cargo.

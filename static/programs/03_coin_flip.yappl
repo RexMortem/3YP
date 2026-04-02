@@ -1,0 +1,3 @@
+let coin = Discrete(0:0.5, 1:0.5);
+let heads = coin:expect(1);
+output(heads);

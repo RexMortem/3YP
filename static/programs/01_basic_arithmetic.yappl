@@ -1,0 +1,8 @@
+let x = 10;
+let y = 3;
+let sum = x + y;
+let diff = x - y;
+let prod = x * y;
+output(sum);
+output(diff);
+output(prod);

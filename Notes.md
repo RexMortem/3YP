@@ -54,3 +54,12 @@ https://www.ibm.com/think/topics/monte-carlo-simulation
 https://www.cs.cmu.edu/afs/cs/academic/class/15451-s07/www/lecture_notes/lect0123.pdf
 https://probabilistic-programming.org/
 
+Solovay-Strassen Primality Test:
+- https://www.geeksforgeeks.org/dsa/solovay-strassen-method-of-primality-test/
+
+Probability of failure is at most 2^{-k} so we have 1/2 each trial
+
+
+# Existing Probabilistic Programming Languages
+
+- R2: Probabilistic Programming Tool (https://www.microsoft.com/en-us/download/details.aspx?id=52372) (https://www.microsoft.com/en-us/research/project/r2-a-probabilistic-programming-system/) ()
