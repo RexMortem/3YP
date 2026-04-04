@@ -1,4 +1,4 @@
-// ── Sample programs ────────────────────────────────────────────────────────
+// Sample Programs for users to try out
 
 const PROGRAMS = [
     {
@@ -74,7 +74,7 @@ output(prob7);`
     },
 ];
 
-// ── YAPPL CodeMirror mode ──────────────────────────────────────────────────
+// YAPPL CodeMirror Stuff
 
 CodeMirror.defineMode("yappl", function () {
     const keywords = new Set(["let", "output"]);
@@ -88,7 +88,7 @@ CodeMirror.defineMode("yappl", function () {
         token: function (stream, state) {
             if (stream.eatSpace()) return null;
 
-            // Numbers (int or float, possibly leading -)
+            // Numbers (int or float)
             if (stream.match(/^-?\d+(\.\d+)?/)) return "number";
 
             // Identifiers and keywords
@@ -121,34 +121,21 @@ CodeMirror.defineMode("yappl", function () {
     };
 });
 
-// ── Theme management ───────────────────────────────────────────────────────
-
-let isDark = true;
-
-function applyTheme(dark) {
-    isDark = dark;
-    document.documentElement.setAttribute("data-bs-theme", dark ? "dark" : "light");
-
-    const iconEl = document.getElementById("theme-icon");
-    iconEl.className = dark ? "bi bi-moon-stars-fill" : "bi bi-sun-fill";
-
-    document.getElementById("cm-theme-dark").disabled  = !dark;
-    document.getElementById("cm-theme-light").disabled = dark;
-
-    if (editor) {
-        editor.setOption("theme", dark ? "dracula" : "eclipse");
-    }
-}
-
-// ── Editor initialisation ──────────────────────────────────────────────────
+// Initialise the code editor
 
 let editor;
 
 document.addEventListener("DOMContentLoaded", function () {
+    // Determine initial theme from what navbar.js already applied
+    const initialTheme = document.documentElement.getAttribute('data-bs-theme') || 'dark';
+
+    // Sync CodeMirror theme link tags
+    syncCmTheme(initialTheme);
+
     // CodeMirror
     editor = CodeMirror.fromTextArea(document.getElementById("code"), {
         mode: "yappl",
-        theme: "dracula",
+        theme: initialTheme === 'dark' ? "dracula" : "eclipse",
         lineNumbers: true,
         indentWithTabs: false,
         tabSize: 4,
@@ -169,11 +156,22 @@ document.addEventListener("DOMContentLoaded", function () {
     // Build sidebar program list
     buildProgramList();
 
-    // Theme toggle
-    document.getElementById("theme-toggle").addEventListener("click", function () {
-        applyTheme(!isDark);
+    // React to theme changes dispatched by navbar.js
+    document.addEventListener('themechange', function (e) {
+        const theme = e.detail.theme;
+        syncCmTheme(theme);
+        if (editor) editor.setOption("theme", theme === 'dark' ? "dracula" : "eclipse");
     });
 });
+
+function syncCmTheme(theme) {
+    const darkLink  = document.getElementById("cm-theme-dark");
+    const lightLink = document.getElementById("cm-theme-light");
+    if (darkLink)  darkLink.disabled  = (theme !== 'dark');
+    if (lightLink) lightLink.disabled = (theme !== 'light');
+}
+
+// Do the sidebar of programs
 
 function buildProgramList() {
     const container = document.getElementById("program-list");
@@ -203,7 +201,17 @@ function buildProgramList() {
     });
 }
 
-// ── Run ────────────────────────────────────────────────────────────────────
+// Undo/Redo Buttons
+
+function editorUndo() {
+    if (editor) editor.execCommand('undo');
+}
+
+function editorRedo() {
+    if (editor) editor.execCommand('redo');
+}
+
+// Run Code Button
 
 async function runCode() {
     const code = editor ? editor.getValue() : document.getElementById("code").value;

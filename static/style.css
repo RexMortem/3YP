@@ -1,14 +1,15 @@
-/* ── Layout ─────────────────────────────────────────────────────── */
+/* Layout */
 
 body {
     font-family: 'Segoe UI', system-ui, sans-serif;
 }
 
 #layout-wrapper {
-    height: calc(100vh - 57px); /* subtract navbar height */
+    height: calc(100vh - 57px);
 }
 
-/* Sidebar — fixed width on desktop, full offcanvas on mobile */
+/* Sidebar */
+
 @media (min-width: 992px) {
     #sidebar {
         width: 260px !important;
@@ -19,16 +20,17 @@ body {
     }
 }
 
-/* Flip chevron when info section is open */
-#info-section.show ~ * .info-chevron,
-.info-chevron.rotated {
-    transform: rotate(180deg);
-}
+/* Info section chevron */
+
 .info-chevron {
     transition: transform 0.2s ease;
 }
 
-/* ── Info section code blocks ───────────────────────────────────── */
+.info-chevron.rotated {
+    transform: rotate(180deg);
+}
+
+/* Info section code blocks */
 
 .info-code {
     font-family: 'Consolas', 'Fira Code', monospace;
@@ -39,7 +41,7 @@ body {
     overflow-x: auto;
 }
 
-/* ── CodeMirror editor ──────────────────────────────────────────── */
+/*  CodeMirror editor */
 
 #editor-wrapper .CodeMirror {
     height: 300px;
@@ -52,7 +54,7 @@ body {
     overflow: hidden;
 }
 
-/* ── Output panel ───────────────────────────────────────────────── */
+/* Output panel  */
 
 #output {
     white-space: pre-wrap;
@@ -78,7 +80,7 @@ body {
     color: #c0392b;
 }
 
-/* ── Program list items ─────────────────────────────────────────── */
+/* Sidebar program list */
 
 .program-item {
     cursor: pointer;

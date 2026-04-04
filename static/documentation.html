@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>YAPPL — Documentation</title>
+    <!-- Bootstrap 5 -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+    <link rel="stylesheet" href="/style.css">
+    <!-- Shared navbar (sets theme immediately, injects navbar on DOMContentLoaded) -->
+    <script src="/navbar.js"></script>
+</head>
+<body>
+    <!-- navbar injected here by navbar.js -->
+
+    <div class="container py-5" style="max-width: 860px;">
+
+        <!-- Hero -->
+        <div class="mb-5 text-center">
+            <h1 class="fw-bold display-6">
+                <i class="bi bi-braces text-info"></i> YAPPL
+            </h1>
+            <p class="lead text-muted">Yet Another Probabilistic Programming Language</p>
+            <p class="text-muted">
+                A simple interpreted language for declaring variables, performing arithmetic,
+                and working with probability distributions.
+            </p>
+        </div>
+
+        <!-- Resource cards -->
+        <h5 class="fw-semibold mb-3 text-muted text-uppercase" style="font-size: 0.75rem; letter-spacing: 0.08em;">
+            Resources
+        </h5>
+        <div class="row g-3 mb-5">
+
+            <!-- GitHub -->
+            <div class="col-md-4">
+                <div class="card h-100">
+                    <div class="card-body d-flex flex-column align-items-start gap-2">
+                        <i class="bi bi-github fs-2"></i>
+                        <h6 class="card-title mb-0 fw-semibold">Source Code</h6>
+                        <p class="card-text small text-muted flex-grow-1">
+                            Browse the YAPPL interpreter source, open issues, and follow development.
+                        </p>
+                        <a href="https://github.com/RexMortem/3YP"
+                           target="_blank"
+                           rel="noopener noreferrer"
+                           class="btn btn-sm btn-outline-secondary">
+                            <i class="bi bi-box-arrow-up-right me-1"></i> GitHub Repository
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Dissertation -->
+            <div class="col-md-4">
+                <div class="card h-100">
+                    <div class="card-body d-flex flex-column align-items-start gap-2">
+                        <i class="bi bi-mortarboard fs-2 text-warning"></i>
+                        <h6 class="card-title mb-0 fw-semibold">Dissertation</h6>
+                        <p class="card-text small text-muted flex-grow-1">
+                            The full third-year project dissertation covering design, implementation, and evaluation.
+                        </p>
+                        <a href="/dissertation.pdf"
+                           download
+                           class="btn btn-sm btn-outline-warning">
+                            <i class="bi bi-file-earmark-pdf me-1"></i> Download PDF
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Language Specification -->
+            <div class="col-md-4">
+                <div class="card h-100">
+                    <div class="card-body d-flex flex-column align-items-start gap-2">
+                        <i class="bi bi-file-earmark-text fs-2 text-info"></i>
+                        <h6 class="card-title mb-0 fw-semibold">Language Specification</h6>
+                        <p class="card-text small text-muted flex-grow-1">
+                            Formal specification of YAPPL's syntax, semantics, and built-in distributions.
+                        </p>
+                        <a href="/language-spec.pdf"
+                           download
+                           class="btn btn-sm btn-outline-info">
+                            <i class="bi bi-file-earmark-pdf me-1"></i> Download PDF
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+        <!-- Language Reference -->
+        <h5 class="fw-semibold mb-3 text-muted text-uppercase" style="font-size: 0.75rem; letter-spacing: 0.08em;">
+            Language Reference
+        </h5>
+
+        <div class="card mb-3">
+            <div class="card-header fw-semibold">Statements</div>
+            <div class="card-body">
+                <table class="table table-sm mb-0">
+                    <thead>
+                        <tr>
+                            <th style="width:40%">Syntax</th>
+                            <th>Description</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr><td><code>let x;</code></td><td>Declare a variable (initialised to 0)</td></tr>
+                        <tr><td><code>let x = expr;</code></td><td>Declare and assign</td></tr>
+                        <tr><td><code>x = expr;</code></td><td>Reassign an existing variable</td></tr>
+                        <tr><td><code>output(expr);</code></td><td>Print a value to the output panel</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <div class="card mb-3">
+            <div class="card-header fw-semibold">Expressions &amp; Operators</div>
+            <div class="card-body">
+                <table class="table table-sm mb-0">
+                    <thead>
+                        <tr><th style="width:40%">Syntax</th><th>Description</th></tr>
+                    </thead>
+                    <tbody>
+                        <tr><td><code>42</code>, <code>3.14</code></td><td>Integer and float literals</td></tr>
+                        <tr><td><code>x</code></td><td>Variable reference</td></tr>
+                        <tr><td><code>a + b</code>, <code>a - b</code></td><td>Addition, subtraction</td></tr>
+                        <tr><td><code>a * b</code>, <code>a / b</code></td><td>Multiplication, division</td></tr>
+                        <tr><td><code>-x</code></td><td>Negation</td></tr>
+                        <tr><td><code>d1 + d2</code></td><td>Combine two distributions (convolution of outcomes)</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <div class="card mb-3">
+            <div class="card-header fw-semibold">Distributions</div>
+            <div class="card-body">
+                <table class="table table-sm mb-0">
+                    <thead>
+                        <tr><th style="width:40%">Syntax</th><th>Description</th></tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><code>uniform(a, b)</code></td>
+                            <td>Discrete uniform distribution over integers [a, b]</td>
+                        </tr>
+                        <tr>
+                            <td><code>uniformContinuous(a, b)</code></td>
+                            <td>Continuous uniform distribution over [a, b]</td>
+                        </tr>
+                        <tr>
+                            <td><code>Discrete(v<sub>1</sub>:p<sub>1</sub>, v<sub>2</sub>:p<sub>2</sub>, ...)</code></td>
+                            <td>Custom discrete distribution with explicit value:probability pairs</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <div class="card mb-5">
+            <div class="card-header fw-semibold">Distribution Methods</div>
+            <div class="card-body">
+                <table class="table table-sm mb-0">
+                    <thead>
+                        <tr><th style="width:40%">Syntax</th><th>Description</th></tr>
+                    </thead>
+                    <tbody>
+                        <tr><td><code>d:expect(v)</code></td><td>P(X = v) — probability of a specific outcome</td></tr>
+                        <tr><td><code>d:min()</code></td><td>Lower bound of the distribution</td></tr>
+                        <tr><td><code>d:max()</code></td><td>Upper bound of the distribution</td></tr>
+                        <tr><td><code>d:mean()</code></td><td>Expected value (mean) of the distribution</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

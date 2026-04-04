@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en" data-bs-theme="dark">
+<html lang="en">
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -12,27 +12,11 @@
     <link rel="stylesheet" id="cm-theme-dark" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.17/theme/dracula.min.css">
     <link rel="stylesheet" id="cm-theme-light" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.17/theme/eclipse.min.css" disabled>
     <link rel="stylesheet" href="/style.css">
+    <!-- Shared navbar (sets theme immediately, injects navbar on DOMContentLoaded) -->
+    <script src="/navbar.js"></script>
 </head>
 <body>
-
-    <!-- Navbar -->
-    <nav class="navbar navbar-expand-lg border-bottom px-3" id="main-navbar">
-        <div class="d-flex align-items-center gap-2 flex-grow-1">
-            <!-- Sidebar toggle (visible on all sizes) -->
-            <button class="btn btn-sm btn-outline-secondary d-lg-none"
-                    type="button" data-bs-toggle="offcanvas" data-bs-target="#sidebar" aria-controls="sidebar">
-                <i class="bi bi-layout-sidebar"></i>
-            </button>
-            <span class="navbar-brand mb-0 fw-semibold fs-5">
-                <i class="bi bi-braces text-info"></i> YAPPL Playground
-            </span>
-        </div>
-        <div class="d-flex align-items-center gap-2">
-            <button id="theme-toggle" class="btn btn-sm btn-outline-secondary" title="Toggle light/dark theme">
-                <i class="bi bi-moon-stars-fill" id="theme-icon"></i>
-            </button>
-        </div>
-    </nav>
+    <!-- navbar injected here by navbar.js -->
 
     <!-- Layout wrapper -->
     <div class="d-flex" id="layout-wrapper">
@@ -63,8 +47,7 @@
                         data-bs-toggle="collapse"
                         data-bs-target="#info-section"
                         aria-expanded="false"
-                        aria-controls="info-section"
-                        id="info-toggle-btn">
+                        aria-controls="info-section">
                     <i class="bi bi-info-circle-fill"></i>
                     <span>About YAPPL</span>
                     <i class="bi bi-chevron-down ms-1 info-chevron"></i>
@@ -116,9 +99,20 @@ let s = d1 + d2;</pre>
                 </div>
             </div>
 
-            <button class="btn btn-primary" onclick="runCode()" id="run-btn">
-                <i class="bi bi-play-fill"></i> Run
-            </button>
+            <!-- Toolbar -->
+            <div class="d-flex align-items-center gap-2">
+                <div class="btn-group btn-group-sm" role="group" aria-label="Edit history">
+                    <button class="btn btn-outline-secondary" id="undo-btn" title="Undo (Ctrl+Z)" onclick="editorUndo()">
+                        <i class="bi bi-arrow-counterclockwise"></i> Undo
+                    </button>
+                    <button class="btn btn-outline-secondary" id="redo-btn" title="Redo (Ctrl+Shift+Z)" onclick="editorRedo()">
+                        Redo <i class="bi bi-arrow-clockwise"></i>
+                    </button>
+                </div>
+                <button class="btn btn-sm btn-primary" onclick="runCode()" id="run-btn">
+                    <i class="bi bi-play-fill"></i> Run
+                </button>
+            </div>
 
             <!-- Output -->
             <div id="output" class="mt-3 rounded p-3">Output will appear here...</div>

@@ -4,8 +4,10 @@ use crate::interpreter::run_to_string;
 use crate::parser::parse;
 
 const HTML: &str = include_str!("../static/index.html");
+const DOCS_HTML: &str = include_str!("../static/documentation.html");
 const CSS: &str = include_str!("../static/style.css");
 const JS: &str = include_str!("../static/playground.js");
+const NAVBAR_JS: &str = include_str!("../static/navbar.js");
 
 pub fn serve(port: u16) {
     let addr = format!("0.0.0.0:{}", port);
@@ -39,6 +41,22 @@ pub fn serve(port: u16) {
             (tiny_http::Method::Get, "/playground.js") => {
                 let response = tiny_http::Response::from_string(JS).with_header(
                     tiny_http::Header::from_bytes("Content-Type", "text/javascript; charset=utf-8")
+                        .unwrap(),
+                );
+                let _ = request.respond(response);
+            }
+
+            (tiny_http::Method::Get, "/navbar.js") => {
+                let response = tiny_http::Response::from_string(NAVBAR_JS).with_header(
+                    tiny_http::Header::from_bytes("Content-Type", "text/javascript; charset=utf-8")
+                        .unwrap(),
+                );
+                let _ = request.respond(response);
+            }
+
+            (tiny_http::Method::Get, "/documentation.html") => {
+                let response = tiny_http::Response::from_string(DOCS_HTML).with_header(
+                    tiny_http::Header::from_bytes("Content-Type", "text/html; charset=utf-8")
                         .unwrap(),
                 );
                 let _ = request.respond(response);
