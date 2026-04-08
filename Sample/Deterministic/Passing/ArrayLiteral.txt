@@ -8,7 +8,7 @@ output(flags);
 
 // Arrays can hold floats.
 let coords = [1.5, 2.5, 3.5];
-output(coords);
+output(cos);
 
 // Empty array.
 let empty = [];
