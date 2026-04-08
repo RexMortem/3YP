@@ -1,41 +1,188 @@
-# entry-point into grammar (will probably have to refactor if complicated structures to be introduced e.g. loops, functions etc.)
-program ::= statementList
-statementList ::= statement ";" statementList | epsilon
+# YAPPL Grammar
+# ============================================================================
+# All statements end with ";". Function and enum definitions do NOT end with ";".
+# Whitespace and `//` line comments may appear between any two tokens.
 
-statement ::= var_declaration | statement_assignment | hardcoded_output # unlikely that primitive functions like hardcoded_output will be implemented this way in final product
-statement_assignment ::= var assignment
-hardcoded_output = "output(" expr ")"
+# ── Top-Level ─────────────────────────────────────────────────────────────────
 
-var_declaration ::= "let" var var_declaration_prime
-var_declaration_prime ::= assignment | epsilon
+program         ::= program_item*
+program_item    ::= enum_def
+                  | fn_def
+                  | pb_fn_def
+                  | statement ";"
 
-var ::= ("dist" dist_type | "res" res_type) VAR_NAME
+# ── Enum Definitions ──────────────────────────────────────────────────────────
+# Enum name and all variants must begin with an uppercase letter.
 
-dist_type ::= "uniform" # only uniform distribution for now
+enum_def        ::= "enum" UIDENT "{" variant_list "}"
+variant_list    ::= UIDENT ("," UIDENT)*
 
-res_type ::= "int" # only ints as a value type for now
+# ── Function Definitions ──────────────────────────────────────────────────────
 
-assignment ::= "=" expr 
+fn_def          ::= "fn" IDENT "(" param_list ")" "->" type block
 
-expr ::= additive_term | dist_inst 
-dist_inst = dist_type "(" arg_list ")"
+pb_fn_def       ::= "pb" "function" IDENT "(" param_list ")" "->" type
+                    "{" pb_metadata "}"
+                    block
 
-additive_term ::= multiplicative_term (("+"|"-") multiplicative_term)*
-multiplicative_term ::= unary_term (("*"|"/") unary_term)*
+pb_metadata     ::= "error_class" ":" error_class ","
+                    "error_distribution" ":" IDENT
 
-unary_term ::= "-" unary_term | primary_term
+error_class     ::= "RP" | "coRP" | "BPP"
 
-primary_term ::= "(" expr ")" 
-    | var_usage
-    | INT_LIT
+param_list      ::= param ("," param)* | epsilon
+param           ::= IDENT ":" type
 
-var_usage = VAR_NAME opt_fun_call
-opt_fun_call = ":" VAR_NAME "(" arg_list ")" | epsilon
+# Scalar types are lowercase; enum types and typed distributions use uppercase names.
+type            ::= "int"
+                  | "float"
+                  | "bool"
+                  | "Discrete" "<" UIDENT ">"     # typed discrete distribution
+                  | UIDENT                        # enum type name
 
-dist_inst = DIST_NAME "(" arg_list ")"
+# ── Blocks and Statements ─────────────────────────────────────────────────────
 
-arg_list = arg ("," arg)* | epsilon
-arg = expr 
+block           ::= "{" statement_list "}"
+statement_list  ::= (statement ";")*
 
-param_list = param ("," param)* | epsilon 
-param = VAR_NAME
+statement       ::= pb_call_assign
+                  | distribution_of_stmt
+                  | map_call_assign
+                  | return_stmt
+                  | if_stmt
+                  | var_declaration
+                  | hardcoded_output
+                  | statement_assignment
+
+# `let result, info = f(args) with confidence >= <float>`
+pb_call_assign  ::= "let" IDENT "," IDENT "=" IDENT "(" arg_list ")"
+                    "with" "confidence" ">=" FLOAT_LIT
+
+# `let v = distribution_of(f(args), analytical)`
+# `let v = distribution_of(f(args), empirical [, INT_LIT])`
+# `let v = distribution_of(f(args), bayesian  [, INT_LIT])`
+distribution_of_stmt ::=
+      "let" IDENT "=" "distribution_of" "(" IDENT "(" arg_list ")" "," of_mode ")"
+of_mode         ::= "analytical"
+                  | "empirical" ("," INT_LIT)?
+                  | "bayesian"  ("," INT_LIT)?
+
+# `let v = map(f, arr) [with confidence >= <float>]`
+# When `with confidence` is present, f must be a pb function; the error budget
+# is split across all array elements via the union (Bonferroni) bound.
+map_call_assign ::= "let" IDENT "=" "map" "(" IDENT "," expr ")"
+                    ("with" "confidence" ">=" FLOAT_LIT)?
+
+return_stmt     ::= "return" expr?
+
+if_stmt         ::= "if" expr block ("else" block)?
+
+var_declaration ::= "let" IDENT ("=" expr)?
+
+statement_assignment ::= IDENT "=" expr
+
+hardcoded_output ::= "output(" expr ")"
+
+# ── Expressions ───────────────────────────────────────────────────────────────
+# Precedence (lowest → highest):
+#   OR → AND → CMP → ADD → MUL → UNARY → PRIMARY(+postfix)
+
+expr            ::= or_expr
+or_expr         ::= and_expr ("||" and_expr)*
+and_expr        ::= cmp_expr ("&&" cmp_expr)*
+
+cmp_expr        ::= add_expr (cmp_tail)?
+cmp_tail        ::= "~=" add_expr ("within" add_expr)?    # approximate equality
+                  | cmp_op  add_expr                      # strict comparison
+cmp_op          ::= "==" | "!=" | "<=" | ">=" | "<" | ">"
+
+add_expr        ::= mul_term (("+"|"-") mul_term)*
+mul_term        ::= unary_term (("*"|"/"|"%"|"mod") unary_term)*
+unary_term      ::= "-" unary_term
+                  | "!" unary_term
+                  | primary_postfix
+
+# After any primary, any chain of method calls with `.` or legacy `:` syntax.
+primary_postfix ::= primary_term method_call*
+method_call     ::= ("."|":") IDENT "(" arg_list ")"
+
+primary_term    ::= "(" expr ")"
+                  | array_literal
+                  | "true" | "false"
+                  | func_call
+                  | var_usage
+                  | NUMBER_LIT
+
+array_literal   ::= "[" arg_list "]"
+
+# Any identifier followed by "(" is a function / constructor call.
+# The parser dispatches on the identifier for built-in constructors
+# (uniform, Bernoulli, Discrete, …) before falling back to a generic call.
+func_call       ::= IDENT "(" arg_list ")"
+
+var_usage       ::= IDENT                  # plain variable or enum variant
+
+arg_list        ::= expr ("," expr)* | epsilon
+
+# ── Distribution Constructors (special func_call names) ──────────────────────
+
+dist_ctor       ::= "uniform"           "(" expr "," expr ")"
+                  | "uniformContinuous" "(" expr "," expr ")"
+                  | "Discrete"          "(" discrete_pair_list ")"
+                  | "Bernoulli"         "(" expr ")"
+                  | "Binomial"          "(" expr "," expr ")"
+                  | "Geometric"         "(" expr ")"
+
+discrete_pair_list ::= discrete_pair ("," discrete_pair)*
+discrete_pair      ::= expr ":" expr
+
+# ── Certainty Markers (special func_call names) ──────────────────────────────
+# Used inside probabilistic function bodies on the return expression.
+
+certainty_call  ::= "Certain"   "(" expr ")"
+                  | "Uncertain" "(" expr ")"
+
+# ── Markov-Chain / Distribution Built-in Functions ───────────────────────────
+# These special forms take a bare function name (not a value) as an argument.
+
+markov_call     ::= "bind" "(" expr "," IDENT ")"
+                  | "step" "(" expr "," IDENT "," expr ")"
+
+# ── Numeric / Symbolic Built-in Functions ────────────────────────────────────
+# Handled as regular func_call, implemented natively:
+#
+#   jacobi(a, n)            -- Jacobi symbol (a|n); returns -1, 0, or 1
+#   mod_exp(base, exp, m)   -- modular exponentiation: base^exp mod m
+
+# ── Distribution Methods (via `.method(args)` or `:method(args)`) ────────────
+# Called on any expression of distribution type. Legal methods:
+#
+#   sample()        — draw one random value
+#   visualise()     — build a histogram (render as ASCII or SVG)
+#   visualize()     — US-spelling alias
+#   expect(k)       — P(X = k), returned as an exact Fraction
+#   mean()          — analytical mean
+#   min()           — lower bound (uniform distributions only)
+#   max()           — upper bound (uniform distributions only)
+
+# ── Literals ─────────────────────────────────────────────────────────────────
+
+NUMBER_LIT  ::= INT_LIT | FLOAT_LIT
+INT_LIT     ::= [0-9]+
+FLOAT_LIT   ::= [0-9]+ "." [0-9]+
+
+IDENT       ::= [a-zA-Z_][a-zA-Z0-9_]*              # any identifier
+UIDENT      ::= [A-Z][a-zA-Z0-9_]*                  # uppercase-initial identifier
+                                                    # (enum types, variants)
+
+# ── Reserved Keywords ────────────────────────────────────────────────────────
+# These cannot be used as variable names:
+#
+#   let if else return fn pb function output mod
+#   int float bool with confidence true false
+#   Certain Uncertain and or not map distribution_of within
+#   enum bind step
+
+# ── Comments ─────────────────────────────────────────────────────────────────
+# Single-line only; stripped by the whitespace eater before tokens.
+COMMENT     ::= "//" [^\n]* "\n"

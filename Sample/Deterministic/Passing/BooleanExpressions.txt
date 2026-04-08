@@ -1,0 +1,19 @@
+// Comparison operators return bool values.
+let a = 5;
+let b = 3;
+output(a == 5);   // true
+output(a != b);   // true
+output(a > b);    // true
+output(a < b);    // false
+output(a >= 5);   // true
+output(a <= 4);   // false
+
+// Logical operators: && (and), || (or), ! (not)
+output(true && false);  // false
+output(true || false);  // true
+output(!true);          // false
+output(!false);         // true
+
+// Short boolean expressions
+output(1 == 1);         // true
+output(2 != 2);         // false

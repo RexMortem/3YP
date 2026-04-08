@@ -1,0 +1,55 @@
+// ── Trivial RP Algorithm: Coin Never Heads ────────────────────────────────────
+//
+// Claim: "this coin NEVER lands heads."
+//
+// Error class: RP  ("false/no" is always correct)
+//   Certain(false)  = we flipped heads → the coin CAN land heads → claim is DEFINITELY wrong
+//   Uncertain(true) = we flipped tails → no evidence against the claim this round
+//
+// If the coin is biased toward heads (e.g. p = 0.7):
+//   Each round has probability 0.7 of Certain(false).
+//   The runner quickly accumulates enough Certain(false) evidence and returns false.
+//
+// If the coin truly never lands heads (p = 0.0):
+//   Every round returns Uncertain(true) (we never see heads).
+//   The runner amplifies confidence: after k rounds, confidence = 1 - (1/2)^k.
+//   (Modelled as Geometric: each round has half the remaining error probability.)
+//
+// Key RP property: when the coin CAN land heads, we will eventually see a head.
+//   "No" is ALWAYS correct. "Yes" just means we haven't disproved it yet.
+
+pb function never_heads(p: float) -> bool {
+    error_class: RP,
+    error_distribution: Geometric
+} {
+    flip = Bernoulli(p).sample();
+
+    // A head is definitive proof the coin is NOT never-heads.
+    if flip { return Certain(false); };
+
+    // Tails: no disproof this round, but the claim might still be true.
+    return Uncertain(true);
+}
+
+// ── Example 1: fair coin (p = 0.5) ───────────────────────────────────────────
+// True answer: "no" (a fair coin CAN land heads).
+// Each round has 50% chance of Certain(false).
+// Expected: result = false, very few rounds needed.
+let r1, i1 = never_heads(0.5) with confidence >= 0.9;
+output(r1);    // false — fair coins can land heads
+output(i1);
+
+// ── Example 2: heavily biased toward heads (p = 0.9) ─────────────────────────
+// True answer: "no" (a 90%-heads coin can land heads).
+// Each round has 90% chance of Certain(false). Should resolve in 1 round.
+let r2, i2 = never_heads(0.9) with confidence >= 0.9;
+output(r2);    // false — this coin almost certainly lands heads every round
+output(i2);
+
+// ── Example 3: simulate a "never-heads" coin using p = 0.001 ─────────────────
+// True answer: "yes" (almost never lands heads for practical purposes).
+// Each round has 0.1% chance of Certain(false), 99.9% Uncertain(true).
+// Runner accumulates Uncertain(true) and returns true with target confidence.
+let r3, i3 = never_heads(0.001) with confidence >= 0.9;
+output(r3);    // true — practically never-heads
+output(i3);

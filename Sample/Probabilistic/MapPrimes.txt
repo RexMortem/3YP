@@ -1,0 +1,49 @@
+// map() — applying a probabilistic function to a list with a shared confidence budget.
+//
+// The union bound divides the error budget evenly across all n elements:
+//   per-element confidence = 1 - (1 - overall_confidence) / n
+//
+// For 9 elements and overall confidence 0.99:
+//   per-element confidence = 1 - 0.01/9 ≈ 0.998889
+//   per-element rounds (RP): k = ceil(-log2(1 - 0.998889)) = ceil(9.82) = 10
+//
+// The guarantee: the probability that ANY element in the result is wrong is <= 0.01.
+
+pb function is_prime(p: int) -> bool {
+    error_class: RP,
+    error_distribution: Geometric
+} {
+    if p < 2 { return Certain(false); };
+    if p == 2 { return Certain(true); };
+    if p % 2 == 0 { return Certain(false); };
+
+    a = uniform(1, p - 1).sample();
+    jacobian = (p + jacobi(a, p)) % p;
+    euler = mod_exp(a, (p - 1) / 2, p);
+
+    if jacobian == 0 { return Certain(false); };
+    if euler != jacobian { return Certain(false); };
+    return Uncertain(true);
+}
+
+// Apply is_prime to each element in the array.
+// The 0.99 confidence budget is split across all 9 elements via the union bound.
+let primes = map(is_prime, [2, 3, 4, 5, 6, 7, 8, 9, 10]) with confidence >= 0.99;
+output(primes);
+// -> [true, true, false, true, false, true, false, false, false]
+
+// map also works with regular (deterministic) functions — no confidence needed.
+fn double(n: int) -> int {
+    return n * 2;
+}
+
+let doubled = map(double, [1, 2, 3, 4, 5]);
+output(doubled);
+// -> [2, 4, 6, 8, 10]
+
+// sample() also works with the colon (:) syntax, mirroring expect/mean/min/max.
+let die = uniform(1, 6);
+let avg  = die:mean();    // analytical: 3.5
+let roll = die:sample();  // random sample from [1, 6]
+output(avg);
+output(roll);

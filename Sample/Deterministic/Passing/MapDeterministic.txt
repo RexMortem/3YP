@@ -1,0 +1,21 @@
+// map() applies a regular function to every element of an array.
+fn double(n: int) -> int {
+    return n * 2;
+}
+
+fn is_even(n: int) -> bool {
+    return n % 2 == 0;
+}
+
+fn negate(n: int) -> int {
+    return 0 - n;
+}
+
+let doubled = map(double, [1, 2, 3, 4, 5]);
+output(doubled);
+
+let evens = map(is_even, [1, 2, 3, 4, 5, 6]);
+output(evens);
+
+let negated = map(negate, [10, 20, 30]);
+output(negated);

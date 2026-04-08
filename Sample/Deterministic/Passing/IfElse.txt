@@ -1,0 +1,24 @@
+// if runs the then-block when the condition is true.
+let x = 10;
+if x > 5 {
+    output(x);
+};
+
+// if/else — condition is false, so the else-block runs.
+if x < 5 {
+    output(0);
+} else {
+    output(1);
+};
+
+// Nested if: classify a number as negative, zero, or positive.
+let n = -3;
+if n < 0 {
+    output(0);
+} else {
+    if n == 0 {
+        output(1);
+    } else {
+        output(2);
+    };
+};

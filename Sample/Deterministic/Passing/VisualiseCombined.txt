@@ -1,0 +1,20 @@
+// Visualising derived and combined distributions.
+
+// Sum of two dice: 36 equally probable (outcome, probability) pairs combine
+// into 11 distinct sums. The bell-curve shape of P(sum = v) is visible.
+let d1 = uniform(1, 6);
+let d2 = uniform(1, 6);
+let two_dice = d1 + d2;
+output(two_dice:visualise());
+
+// Bernoulli(0.8): P(true=1) = 0.8, P(false=0) = 0.2
+let trial = Bernoulli(0.8);
+output(trial:visualise());
+
+// Binomial(8, 0.5): number of heads in 8 fair coin flips
+let flips = Binomial(8, 0.5);
+output(flips:visualise());
+
+// Geometric(0.4): number of trials until first success
+let wait = Geometric(0.4);
+output(wait:visualise());

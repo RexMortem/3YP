@@ -1,0 +1,59 @@
+// distribution_of() — extracting the implicit distribution of a pb function.
+//
+// Every pb function implicitly samples from an underlying per-round distribution:
+//   - On each round it returns Certain(x) (definitive) or Uncertain(x) (probabilistic).
+//   - The probability of returning Certain is the key quantity.
+//
+// distribution_of() exposes this three ways:
+//   analytical  — derived from the error class (no sampling needed)
+//   empirical   — estimated by running N single rounds
+//   bayesian    — Beta posterior after observing N rounds (starts at uniform prior)
+
+pb function is_prime(p: int) -> bool {
+    error_class: RP,
+    error_distribution: Geometric
+} {
+    if p < 2 { return Certain(false); };
+    if p == 2 { return Certain(true); };
+    if p % 2 == 0 { return Certain(false); };
+    a = uniform(1, p - 1).sample();
+    jacobian = (p + jacobi(a, p)) % p;
+    euler = mod_exp(a, (p - 1) / 2, p);
+    if jacobian == 0 { return Certain(false); };
+    if euler != jacobian { return Certain(false); };
+    return Uncertain(true);
+}
+
+// ── Input: 53 (prime) ─────────────────────────────────────────────────────────
+// For a prime, every round returns Uncertain(true) — the algorithm can never
+// produce a false negative.  The empirical Certain rate should be near 0.
+
+// Analytical: RP worst case → Geometric(0.5) over rounds until Certain.
+let analytic_prime = distribution_of(is_prime(53), analytical);
+output(analytic_prime);
+output(analytic_prime:visualise());
+
+// Empirical: run 200 rounds — should show near-zero Certain rate for a prime.
+let empirical_prime = distribution_of(is_prime(53), empirical, 200);
+output(empirical_prime);
+output(empirical_prime:visualise());
+
+// Bayesian: Beta posterior over per-round Certain probability.
+// Prior Beta(1,1) updated with 200 observations.
+// For a prime: nearly all rounds are Uncertain → posterior concentrates near 0.
+let bayesian_prime = distribution_of(is_prime(53), bayesian, 200);
+output(bayesian_prime);
+output(bayesian_prime:visualise());
+
+// ── Input: 119 (composite: 7 × 17) ──────────────────────────────────────────
+// Solovay-Strassen detects most composites in the first round.
+// Only 2 Euler liars (a=1, a=118) out of 117 witnesses → per-round Certain ≈ 115/117 ≈ 98%.
+// Empirical and Bayesian should concentrate near 1.
+
+let empirical_comp = distribution_of(is_prime(119), empirical, 200);
+output(empirical_comp);
+output(empirical_comp:visualise());
+
+let bayesian_comp = distribution_of(is_prime(119), bayesian, 200);
+output(bayesian_comp);
+output(bayesian_comp:visualise());

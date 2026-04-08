@@ -1,0 +1,61 @@
+// Fermat Compositeness Test — a classic coRP algorithm
+//
+// Fermat's little theorem: if p is prime, then for every a with 1 < a < p,
+//   a^(p-1) ≡ 1 (mod p)
+//
+// Contrapositive: if a^(n-1) ≢ 1 (mod n), then n is DEFINITELY composite.
+// Such an 'a' is called a Fermat witness for n.
+//
+// Error class: coRP  ("yes, it is composite" is always correct)
+//   - Certain(true)   = found a Fermat witness -> n is DEFINITELY composite
+//   - Uncertain(false) = no witness found      -> n is probably prime
+//
+// One-sided guarantee: if n IS prime, Fermat's theorem ensures no witness exists;
+// every round returns Uncertain(false) — the correct answer.
+// If n IS composite, at least 1/2 of the values in [2, n-2] are Fermat witnesses
+// (for most composites), so each round detects compositeness with probability >= 1/2.
+//
+// Known weakness — Carmichael numbers (e.g. 561 = 3×11×17, 1105 = 5×13×17):
+//   For these rare composites, a^(n-1) ≡ 1 (mod n) for ALL a coprime to n.
+//   No Fermat witness exists, so this test always returns Uncertain(false) — wrong!
+//   The Solovay-Strassen / Miller-Rabin tests do not share this weakness.
+
+pb function is_composite(n: int) -> bool {
+    error_class: coRP,
+    error_distribution: Geometric
+} {
+    // Deterministic edge cases
+    if n < 2 { return Certain(true); };       // 0 and 1 are not prime
+    if n == 2 { return Uncertain(false); };   // 2 is prime
+    if n == 3 { return Uncertain(false); };   // 3 is prime
+    if n % 2 == 0 { return Certain(true); };  // all even n > 2 are composite
+
+    // Pick a random Fermat witness candidate from [2, n-2]
+    a = uniform(2, n - 2).sample();
+
+    // Fermat's little theorem requires a^(n-1) ≡ 1 (mod n) for prime n.
+    // Violation => definitive proof of compositeness.
+    if mod_exp(a, n - 1, n) != 1 { return Certain(true); };
+
+    // No witness found; n is probably prime
+    return Uncertain(false);
+}
+
+// 53 is prime: no Fermat witness exists for any a.
+// All rounds return Uncertain(false); confidence = 1 - (1/2)^k.
+// For confidence >= 0.99: k = ceil(-log2(0.01)) = 7 rounds.
+let r1, info1 = is_composite(53) with confidence >= 0.99;
+output(r1);     // -> false  (53 is not composite)
+output(info1);  // -> Info { rounds: 7, confidence: 0.992188 }
+
+// 119 = 7 x 17, composite.
+// 2^118 mod 119 = 2 (not 1), so a = 2 is a Fermat witness.
+// First round almost certainly fires Certain(true) immediately.
+let r2, info2 = is_composite(119) with confidence >= 0.99;
+output(r2);     // -> true   (119 is composite)
+output(info2);  // -> Info { rounds: 1, confidence: 1.000000 }
+
+// 15 = 3 x 5, composite and small.
+let r3, info3 = is_composite(15) with confidence >= 0.99;
+output(r3);     // -> true
+output(info3);

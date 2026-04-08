@@ -1,9 +1,0 @@
-let die = uniform(1, 6);
-let prob = die:expect(4);
-let lo = die:min();
-let hi = die:max();
-let avg = die:mean();
-output(prob);
-output(lo);
-output(hi);
-output(avg);

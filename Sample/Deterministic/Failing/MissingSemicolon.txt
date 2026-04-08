@@ -1,0 +1,4 @@
+// Every statement must end with ';'. Missing semicolons cause a parse error.
+let x = 5
+let y = 10
+output(x + y)

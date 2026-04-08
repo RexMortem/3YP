@@ -1,0 +1,52 @@
+// Randomized Bias Detection — a BPP algorithm
+//
+// Problem: given a coin with unknown bias p, determine whether p >= 0.5
+//          (coin is biased toward heads) or p < 0.5 (biased toward tails).
+//
+// Each round samples the coin once and casts a vote.
+// With p = 0.75:
+//   - Pr[sample = true]  = 0.75  -> votes Uncertain(true)   (correct)
+//   - Pr[sample = false] = 0.25  -> votes Uncertain(false)  (incorrect, two-sided error)
+//
+// Per-round success probability = 0.75 = 3/4, the standard BPP assumption.
+// After k rounds, the majority vote is correct with confidence >= 1 - exp(-k/8).
+//
+// This is BPP, not RP/coRP: errors are two-sided.
+//   - Neither "biased up" nor "biased down" has a zero-error direction.
+//   - A single round may be wrong in EITHER direction.
+//   - Only the majority across many rounds converges to the truth.
+//
+// Contrast with Solovay-Strassen (RP):
+//   Certain(false) for a composite is NEVER wrong — one direction is guaranteed.
+//   BPP has no such guarantee; it relies entirely on statistical amplification.
+//
+// BPP round count for confidence c:
+//   k = ceil(-8 * ln(1 - c))
+//   For c = 0.99: k = ceil(-8 * ln(0.01)) = ceil(36.84) = 37 rounds.
+
+pb function is_biased_up(p: float) -> bool {
+    error_class: BPP,
+    error_distribution: Binomial
+} {
+    // Sample the coin: true = heads (1), false = tails (0)
+    outcome = Bernoulli(p).sample();
+
+    // Each sample casts a vote toward the likely bias direction.
+    // With p = 0.75: 3 out of 4 rounds correctly vote Uncertain(true).
+    // With p = 0.25: 3 out of 4 rounds correctly vote Uncertain(false).
+    if outcome { return Uncertain(true); };
+    return Uncertain(false);
+}
+
+// Coin with p = 0.75: biased toward heads -> answer is "yes, biased up".
+// Per-round success = 0.75 = exactly the BPP 3/4 bound.
+// 37 rounds needed; expected ~28 true votes vs ~9 false votes.
+let r1, info1 = is_biased_up(0.75) with confidence >= 0.99;
+output(r1);     // -> true   (biased toward heads)
+output(info1);  // -> Info { rounds: 37, confidence: 0.990... }
+
+// Coin with p = 0.25: biased toward tails -> answer is "no, not biased up".
+// Per-round success when voting Uncertain(false) = 0.75 = 3/4. Same round count.
+let r2, info2 = is_biased_up(0.25) with confidence >= 0.99;
+output(r2);     // -> false  (biased toward tails)
+output(info2);  // -> Info { rounds: 37, confidence: 0.990... }

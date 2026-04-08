@@ -4,6 +4,7 @@ version = "0.1.0"
 edition = "2024"
 
 [dependencies]
+fraction = "0.15"
 nom = "7.1"
 rand = "0.8.5"
 tiny_http = "0.12"

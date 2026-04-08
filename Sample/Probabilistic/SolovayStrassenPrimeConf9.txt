@@ -1,0 +1,55 @@
+// Solovay-Strassen primality test (reference implementation translation)
+//
+// Error class: RP - a "false" answer is always correct; a "true" answer
+// is probabilistic and can be wrong with probability <= (1/2)^k after k rounds.
+//
+// Edge cases handled deterministically before the probabilistic round:
+//   p < 2       -> definitely not prime
+//   p == 2      -> definitely prime (2 is the only even prime)
+//   p % 2 == 0  -> definitely not prime (all other even numbers)
+//
+// Main round logic:
+//   1. Sample a random witness a from [1, p-1]
+//   2. Compute the Jacobi symbol (a|p)
+//   3. Normalise to [0, p-1] via (p + jacobi(a, p)) % p
+//      - this converts the -1 case to p-1, avoiding negative-modulo issues
+//   4. Compute a^((p-1)/2) mod p  (Euler's criterion)
+//   5. If they disagree -> composite (Certain(false))
+//   6. Otherwise        -> probably prime (Uncertain(true))
+
+pb function is_prime(p: int) -> bool {
+    error_class: RP,
+    error_distribution: Geometric
+} {
+    // Deterministic edge cases - answered in one round with full confidence
+    if p < 2 { return Certain(false); };
+    if p == 2 { return Certain(true); };
+    if p % 2 == 0 { return Certain(false); };
+
+    // Pick a random witness a in [1, p-1]
+    a = uniform(1, p - 1).sample();
+
+    // Normalise the Jacobi symbol to [0, p-1]:
+    //   jacobi returns -1, 0, or 1
+    //   adding p before taking mod p maps -1 -> p-1, 0 -> 0, 1 -> 1
+    jacobian = (p + jacobi(a, p)) % p;
+
+    // Euler's criterion: a^((p-1)/2) mod p
+    euler = mod_exp(a, (p - 1) / 2, p);
+
+    // jacobian == 0 means the witness found a factor - definitely composite
+    if jacobian == 0 { return Certain(false); };
+
+    // euler != jacobian means the congruence fails - definitely composite
+    if euler != jacobian { return Certain(false); };
+
+    // All checks passed - probably prime
+    return Uncertain(true);
+}
+
+// 53 is prime - should return true
+// confidence >= 0.9 requires ceil(-log2(0.1)) = 4 rounds
+// actual confidence after 4 rounds: 1 - (1/2)^4 = 0.9375
+let result, info = is_prime(53) with confidence >= 0.9;
+output(result);
+output(info);

@@ -1,0 +1,13 @@
+// Demonstrates combining two distributions analytically with '+'.
+// The result is a new distribution over all possible sums.
+let diceRoll = uniform(1, 6);
+let twoRolls = diceRoll + diceRoll;
+
+// P(sum = 7) is the most likely outcome for two fair dice: 6/36
+output(twoRolls:expect(7));
+
+// P(sum = 2) requires rolling 1+1: only 1/36
+output(twoRolls:expect(2));
+
+// P(sum = 12) requires rolling 6+6: only 1/36
+output(twoRolls:expect(12));

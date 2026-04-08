@@ -1,0 +1,15 @@
+// Array literals hold ordered sequences of values.
+let xs = [1, 2, 3, 4, 5];
+output(xs);
+
+// Arrays can hold booleans.
+let flags = [true, false, true];
+output(flags);
+
+// Arrays can hold floats.
+let coords = [1.5, 2.5, 3.5];
+output(coords);
+
+// Empty array.
+let empty = [];
+output(empty);

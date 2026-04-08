@@ -1,0 +1,19 @@
+// Regular deterministic functions with type-annotated parameters.
+fn add(a: int, b: int) -> int {
+    return a + b;
+}
+
+fn square(n: int) -> int {
+    return n * n;
+}
+
+fn max_of(a: int, b: int) -> int {
+    if a > b { return a; };
+    return b;
+}
+
+output(add(3, 4));            // 7
+output(square(5));            // 25
+output(add(square(2), square(3)));  // 4 + 9 = 13
+output(max_of(7, 3));         // 7
+output(max_of(2, 9));         // 9

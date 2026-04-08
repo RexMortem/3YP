@@ -1,0 +1,2 @@
+// Calling a function that has not been defined is a runtime error.
+output(nonexistent_function(42));

@@ -1,0 +1,5 @@
+// Comments are stripped before parsing — this line has no effect.
+let x = 5; // inline comment after a statement
+// Another comment between statements
+let y = 10;
+output(x + y); // should output 15

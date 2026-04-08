@@ -1,0 +1,4 @@
+// Adding a bool to an integer is a type error.
+let x = true;
+let y = 5;
+output(x + y);

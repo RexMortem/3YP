@@ -11,9 +11,10 @@
     // Inject NavBar when DOM Content has loaded
     document.addEventListener('DOMContentLoaded', function () {
         const path = window.location.pathname;
-        const isEditor = path === '/' || path.endsWith('/index.html');
-        const isDocs   = path.endsWith('/documentation.html');
-        const theme    = document.documentElement.getAttribute('data-bs-theme');
+        const isEditor   = path === '/' || path.endsWith('/index.html');
+        const isDocs     = path.endsWith('/documentation.html');
+        const isFeedback = path.endsWith('/feedback.html');
+        const theme      = document.documentElement.getAttribute('data-bs-theme');
 
         const navHTML = `
 <nav class="navbar border-bottom px-3" id="main-navbar">
@@ -24,8 +25,9 @@
                 title="Show programs">
             <i class="bi bi-layout-sidebar"></i>
         </button>` : ''}
-        <a class="navbar-brand mb-0 fw-semibold fs-5 text-decoration-none" href="/">
-            <i class="bi bi-braces text-info"></i> YAPPL Playground
+        <a class="navbar-brand mb-0 fw-semibold fs-5 text-decoration-none d-flex align-items-center gap-2" href="/">
+            <img src="/yappl_logo.png" alt="YAPPL logo" height="28" style="object-fit:contain;">
+            YAPPL Playground
         </a>
         <div class="d-flex gap-1 ms-1">
             <a class="btn btn-sm ${isEditor ? 'btn-secondary' : 'btn-outline-secondary'}" href="/">
@@ -33,6 +35,9 @@
             </a>
             <a class="btn btn-sm ${isDocs ? 'btn-secondary' : 'btn-outline-secondary'}" href="/documentation.html">
                 <i class="bi bi-book"></i> Docs
+            </a>
+            <a class="btn btn-sm ${isFeedback ? 'btn-secondary' : 'btn-outline-secondary'}" href="/feedback.html">
+                <i class="bi bi-chat-heart"></i> Feedback
             </a>
         </div>
     </div>

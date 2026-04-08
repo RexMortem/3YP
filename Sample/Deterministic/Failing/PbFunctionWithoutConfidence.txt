@@ -1,0 +1,10 @@
+// Calling a probabilistic function without 'with confidence >= ...' is an error.
+// Use: let result, info = flip() with confidence >= 0.9;
+pb function flip() -> bool {
+    error_class: RP,
+    error_distribution: Geometric
+} {
+    return Uncertain(true);
+}
+
+let result = flip();

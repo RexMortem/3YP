@@ -57,13 +57,13 @@ body {
 /* Output panel  */
 
 #output {
-    white-space: pre-wrap;
     font-family: 'Consolas', 'Fira Code', monospace;
     font-size: 14px;
     min-height: 80px;
     background: #1e1e1e;
     color: #d4d4d4;
     border: none !important;
+    /* white-space is left to child elements: <pre> for text, SVG for histograms */
 }
 
 [data-bs-theme="light"] #output {
@@ -115,4 +115,28 @@ body {
 
 .program-category:first-child {
     margin-top: 0;
+}
+
+/* Output panel — HTML mode (histograms + text) */
+
+/* Plain text blocks inside HTML output */
+#output pre.yappl-text {
+    font-family: 'Consolas', 'Fira Code', monospace;
+    font-size: 14px;
+    margin: 0;
+    white-space: pre-wrap;
+    background: transparent;
+    border: none;
+    padding: 0;
+    color: inherit;
+}
+
+/* Inline SVG histograms */
+#output svg {
+    overflow: visible;
+}
+
+/* Ensure SVG text inherits the panel colour so it adapts to light/dark */
+#output svg text {
+    font-family: 'Consolas', 'Fira Code', monospace;
 }

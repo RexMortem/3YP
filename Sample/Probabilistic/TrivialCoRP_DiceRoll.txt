@@ -1,0 +1,58 @@
+// ── Trivial coRP Algorithm: Coin Ever Shows Heads ────────────────────────────
+//
+// Claim: "this coin CAN show heads."
+//
+// Error class: coRP  ("true/yes" is always correct)
+//   Certain(true)   = we flipped heads → coin CAN show heads → DEFINITELY yes
+//   Uncertain(false) = we flipped tails → no evidence this round
+//
+// If the coin is biased toward heads (e.g. p = 0.9):
+//   Each round has probability 0.9 of Certain(true).
+//   The runner almost immediately sees heads and returns true.
+//
+// If the coin truly never shows heads (p = 0.0):
+//   Every round returns Uncertain(false).
+//   The runner amplifies confidence: after k rounds, confidence = 1 - (1/2)^k.
+//   (Modelled as Geometric: each round halves the remaining error probability.)
+//
+// Key coRP property: when the coin CAN show heads, we will eventually see one.
+//   "Yes" is ALWAYS correct. "No" just means we never saw heads.
+//
+// Compare with RP: RP can definitively rule out ("no, it never shows heads").
+//                  coRP can definitively confirm ("yes, I saw heads just now").
+
+pb function coin_shows_heads(p: float) -> bool {
+    error_class: coRP,
+    error_distribution: Geometric
+} {
+    flip = Bernoulli(p).sample();
+
+    // A head is definitive proof that heads is possible.
+    if flip { return Certain(true); };
+
+    // Tails: no confirmation this round, but heads might still be possible.
+    return Uncertain(false);
+}
+
+// ── Example 1: fair coin (p = 0.5) ───────────────────────────────────────────
+// True answer: "yes" (fair coins can show heads).
+// Each round has 50% chance of Certain(true).
+// Expected: result = true, very few rounds needed.
+let r1, i1 = coin_shows_heads(0.5) with confidence >= 0.9;
+output(r1);    // true — fair coins do show heads
+output(i1);
+
+// ── Example 2: heavily biased toward heads (p = 0.9) ─────────────────────────
+// True answer: "yes". Each round has 90% chance of Certain(true).
+// Expected: result = true, almost certainly in round 1.
+let r2, i2 = coin_shows_heads(0.9) with confidence >= 0.9;
+output(r2);    // true — this coin practically always shows heads
+output(i2);
+
+// ── Example 3: simulate a "never-heads" coin using p = 0.001 ─────────────────
+// True answer: "no" for practical purposes (essentially impossible to see heads).
+// Each round has 0.1% chance of Certain(true), 99.9% Uncertain(false).
+// Runner accumulates Uncertain(false) and returns false with target confidence.
+let r3, i3 = coin_shows_heads(0.001) with confidence >= 0.9;
+output(r3);    // false — practically never shows heads
+output(i3);

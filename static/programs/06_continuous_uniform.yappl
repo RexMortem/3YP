@@ -1,7 +1,0 @@
-let d = uniformContinuous(0, 10);
-let lo = d:min();
-let hi = d:max();
-let avg = d:mean();
-output(lo);
-output(hi);
-output(avg);

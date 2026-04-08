@@ -1,0 +1,2 @@
+// Accessing a variable that was never declared is a runtime error.
+output(undeclared_variable);

@@ -1,0 +1,51 @@
+// ── Exact equality (==) ──────────────────────────────────────────────────────
+
+// Same type and same parameters → true
+let d1 = uniform(1, 6);
+let d2 = uniform(1, 6);
+output(d1 == d2);
+
+// Different parameters → false
+let d3 = uniform(1, 4);
+output(d1 == d3);
+
+// Different types → false
+let d4 = Geometric(0.5);
+output(d1 == d4);
+
+// Bernoulli with same p → true
+output(Bernoulli(0.3) == Bernoulli(0.3));
+
+// Bernoulli with different p → false
+output(Bernoulli(0.3) == Bernoulli(0.5));
+
+// ── Approximate equality (~=) ────────────────────────────────────────────────
+
+// Two Binomial distributions with the same parameters → TV distance = 0 → true
+let b1 = Binomial(10, 0.5);
+let b2 = Binomial(10, 0.5);
+output(b1 ~= b2);
+
+// Uniform(1,6) vs Uniform(1,6): TV = 0 → true
+output(uniform(1, 6) ~= uniform(1, 6));
+
+// Uniform(1,6) vs Uniform(1,4): different shapes → TV > 0.05 → false
+output(uniform(1, 6) ~= uniform(1, 4));
+
+// Uniform(1,6) vs Uniform(2,7): same spread, shifted by 1 → TV = 2*(1/6) ≈ 0.333 → false
+output(uniform(1, 6) ~= uniform(2, 7));
+
+// Tight tolerance: Bernoulli(0.5) vs Bernoulli(0.52) → TV = 0.02, within 0.05 → true
+output(Bernoulli(0.5) ~= Bernoulli(0.52));
+
+// Strict tolerance: Bernoulli(0.5) vs Bernoulli(0.6) → TV = 0.1, within 0.05 → false
+output(Bernoulli(0.5) ~= Bernoulli(0.6));
+
+// Programmer-specified tolerance
+output(Bernoulli(0.5) ~= Bernoulli(0.6) within 0.15);
+
+// Continuous: UniformContinuous with same params → true (identical means/stds)
+output(uniformContinuous(0.0, 1.0) ~= uniformContinuous(0.0, 1.0));
+
+// Continuous: very different ranges → false
+output(uniformContinuous(0.0, 1.0) ~= uniformContinuous(10.0, 20.0));

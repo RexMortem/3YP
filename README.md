@@ -5,7 +5,7 @@ Third Year Project: Yet Another Probabilistic Programming Language (YAPPL).
 
 If you don't want to build and run the project, you should be able to play around with the language at [https://yappl.containers.uwcs.co.uk/](https://yappl.containers.uwcs.co.uk/) (unless the container has crashed or Portainer has decided to brick itself).
 
-## Locally Testing the Project
+## Locally Trying the Project
 
 For targeting a specific file:
 ```sh
@@ -17,6 +17,13 @@ For running the web interface locally:
 cargo run -- --web
 ```
 And then visit `http://localhost:8080`.
+
+## Locally Testing the Project
+
+For running the unit tests for the project:
+```sh
+cargo test
+```
 
 ## Build and Run w/ Docker (Recommended, for Web Interface)
 
