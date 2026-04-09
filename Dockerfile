@@ -14,6 +14,7 @@ RUN mkdir src && echo "fn main() {}" > src/main.rs && \
 # Build the binary
 COPY src ./src
 COPY static ./static
+COPY Documents ./Documents
 RUN touch src/main.rs && cargo build --release
 
 # Run the project
