@@ -5,6 +5,13 @@ Third Year Project: Yet Another Probabilistic Programming Language (YAPPL).
 
 If you don't want to build and run the project, you should be able to play around with the language at [https://yappl.containers.uwcs.co.uk/](https://yappl.containers.uwcs.co.uk/) (unless the container has crashed or Portainer has decided to brick itself).
 
+## Dependencies
+
+If you want to do some of the below, you might need Cargo and Docker.
+
+Install Cargo and Rust: https://doc.rust-lang.org/cargo/getting-started/installation.html
+Install Docker: https://docs.docker.com/engine/install/
+
 ## Locally Trying the Project
 
 For targeting a specific file:

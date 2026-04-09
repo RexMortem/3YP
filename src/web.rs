@@ -10,6 +10,8 @@ const CSS: &str = include_str!("../static/style.css");
 const JS: &str = include_str!("../static/playground.js");
 const NAVBAR_JS: &str = include_str!("../static/navbar.js");
 const LOGO_PNG: &[u8] = include_bytes!("../static/yappl_logo.png");
+const DISSERTATION_PDF: &[u8] = include_bytes!("../Documents/Dissertation.pdf");
+const SPECIFICATION_PDF: &[u8] = include_bytes!("../Documents/Specification.pdf");
 
 pub fn serve(port: u16) {
     let addr = format!("0.0.0.0:{}", port);
@@ -75,6 +77,20 @@ pub fn serve(port: u16) {
             (tiny_http::Method::Get, "/yappl_logo.png") => {
                 let response = tiny_http::Response::from_data(LOGO_PNG).with_header(
                     tiny_http::Header::from_bytes("Content-Type", "image/png").unwrap(),
+                );
+                let _ = request.respond(response);
+            }
+
+            (tiny_http::Method::Get, "/Dissertation.pdf") => {
+                let response = tiny_http::Response::from_data(DISSERTATION_PDF).with_header(
+                    tiny_http::Header::from_bytes("Content-Type", "application/pdf").unwrap(),
+                );
+                let _ = request.respond(response);
+            }
+
+            (tiny_http::Method::Get, "/Specification.pdf") => {
+                let response = tiny_http::Response::from_data(SPECIFICATION_PDF).with_header(
+                    tiny_http::Header::from_bytes("Content-Type", "application/pdf").unwrap(),
                 );
                 let _ = request.respond(response);
             }
