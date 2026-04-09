@@ -57,36 +57,56 @@
                     <div class="card mt-2">
                         <div class="card-body small">
                             <h6 class="card-title">YAPPL — Yet Another Probabilistic Programming Language</h6>
-                            <p class="text-muted mb-3">A simple language for declaring variables and working with probability distributions.</p>
+                            <p class="text-muted mb-3">
+                                YAPPL is a research language built around the idea that
+                                <strong>probability should be a first-class concern of the language itself</strong>,
+                                not something the programmer has to bolt on with manual bookkeeping.
+                                It provides a small toolkit of features designed to make writing and
+                                analysing randomised algorithms more ergonomic.
+                            </p>
+
                             <div class="row g-3">
                                 <div class="col-md-6">
-                                    <strong>Basic Syntax</strong>
-                                    <pre class="mt-1 p-2 rounded info-code">let x = 5;
-x = x + 1;
-output(x);</pre>
-                                    <strong>Distributions</strong>
-                                    <pre class="mt-1 p-2 rounded info-code">let d = uniform(1, 6);
-let c = uniformContinuous(0, 1);
-let k = Discrete(1:0.3, 2:0.7);
-let s = d1 + d2;</pre>
+                                    <strong>Core ideas</strong>
+                                    <ul class="mt-1 mb-3 ps-3">
+                                        <li>
+                                            <strong>Distributions are values.</strong> Construct them, combine them
+                                            with arithmetic, and query them analytically before sampling.
+                                        </li>
+                                        <li>
+                                            <strong>Probabilistic functions</strong> declare an error class
+                                            (<code>RP</code>, <code>coRP</code>, or <code>BPP</code>) and the runtime
+                                            automatically amplifies confidence to a programmer-specified target.
+                                        </li>
+                                        <li>
+                                            <strong>Late sampling.</strong> The language is designed so that as much
+                                            work as possible happens at the distribution level, and concrete values
+                                            are extracted only at the end.
+                                        </li>
+                                        <li>
+                                            <strong>Composition.</strong> <code>map</code>, <code>bind</code>, and
+                                            <code>step</code> let you build larger probabilistic computations
+                                            from smaller ones — including typed Markov chains over user-defined enums.
+                                        </li>
+                                    </ul>
                                 </div>
                                 <div class="col-md-6">
-                                    <strong>Distribution Methods</strong>
-                                    <ul class="mt-1 mb-2 ps-3">
-                                        <li><code>d:expect(v)</code> — probability that X = v</li>
-                                        <li><code>d:min()</code> — lower bound</li>
-                                        <li><code>d:max()</code> — upper bound</li>
-                                        <li><code>d:mean()</code> — expected value</li>
-                                    </ul>
-                                    <strong>Statements</strong>
-                                    <ul class="mt-1 mb-0 ps-3">
-                                        <li><code>let x;</code> — declare variable</li>
-                                        <li><code>let x = expr;</code> — declare &amp; assign</li>
-                                        <li><code>x = expr;</code> — reassign</li>
-                                        <li><code>output(expr);</code> — print value</li>
+                                    <strong>Try the examples on the left</strong>
+                                    <ul class="mt-1 mb-3 ps-3">
+                                        <li><em>Fair Die</em>, <em>Two Dice Sum</em> — distributions as first-class values.</li>
+                                        <li><em>Bernoulli</em>, <em>Binomial</em>, <em>Geometric</em> — built-in distribution constructors.</li>
+                                        <li><em>Solovay-Strassen Primality</em>, <em>Fermat Compositeness</em>: RP and coRP primality tests with confidence amplification.</li>
+                                        <li><em>Bias Detection (BPP)</em>: two-sided error and majority-vote amplification.</li>
+                                        <li><em>Prime Sieve (map)</em>: apply a probabilistic function to an array under a shared confidence budget.</li>
+                                        <li><em>Underlying Distribution (distribution_of)</em>: extract the analytical, empirical, or Bayesian distribution of a probabilistic function.</li>
                                     </ul>
                                 </div>
                             </div>
+
+                            <p class="text-muted mb-0">
+                                For the full grammar, semantics, and feature reference, see the
+                                <strong>Language Specification</strong> linked from <a href="/documentation.html">Docs</a>.
+                            </p>
                         </div>
                     </div>
                 </div>

@@ -1,4 +1,4 @@
-// ── Markov Chain: Weather Model ───────────────────────────────────────────────
+// Markov Chain: Weather Model
 
 enum Weather { Cloudy, Rainy, Sunny }
 
@@ -13,25 +13,25 @@ fn weather_transition(today: Weather) -> Discrete<Weather> {
     return Discrete(Rainy: 0.7, Cloudy: 0.2, Sunny: 0.1);
 }
 
-// ── One-step transition via bind ──────────────────────────────────────────────
+// One-step transition via bind
 
 // Start from a pure Sunny state and apply one transition.
 let sunny_dist = Discrete(Sunny: 1.0);
 let after_1 = bind(sunny_dist, weather_transition);
 output(after_1);
 
-// ── Multi-step via step() ─────────────────────────────────────────────────────
+// Multi-step via step()
 
 // Run the chain for 3 steps starting from Sunny.
 let after_3 = step(Sunny, weather_transition, 3);
 output(after_3);
 
-// ── Visualise the 5-step distribution ────────────────────────────────────────
+// Visualise the 5-step distribution
 
 let after_5 = step(Sunny, weather_transition, 5);
 output(after_5:visualise());
 
-// ── Stationary distribution ───────────────────────────────────────────────────
+// Stationary distribution
 // After many steps the distribution converges to:
 //   Cloudy ≈ 0.3636, Rainy ≈ 0.1818, Sunny ≈ 0.4545  (analytical: 4/11, 2/11, 5/11)
 let after_50 = step(Sunny, weather_transition, 50);

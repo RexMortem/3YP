@@ -42,7 +42,7 @@
                         <i class="bi bi-github fs-2"></i>
                         <h6 class="card-title mb-0 fw-semibold">Source Code</h6>
                         <p class="card-text small text-muted flex-grow-1">
-                            Browse the YAPPL interpreter source, open issues, and follow development.
+                            Browse the YAPPL interpreter source code (and also for this site!)
                         </p>
                         <a href="https://github.com/RexMortem/3YP"
                            target="_blank"
@@ -61,7 +61,7 @@
                         <i class="bi bi-mortarboard fs-2 text-warning"></i>
                         <h6 class="card-title mb-0 fw-semibold">Dissertation</h6>
                         <p class="card-text small text-muted flex-grow-1">
-                            The full third-year project dissertation covering design, implementation, and evaluation.
+                            The full third-year project dissertation.
                         </p>
                         <a href="/dissertation.pdf"
                            download
@@ -79,7 +79,7 @@
                         <i class="bi bi-file-earmark-text fs-2 text-info"></i>
                         <h6 class="card-title mb-0 fw-semibold">Language Specification</h6>
                         <p class="card-text small text-muted flex-grow-1">
-                            Formal specification of YAPPL's syntax, semantics, and built-in distributions.
+                            Formal specification of YAPPL's syntax and semantics.
                         </p>
                         <a href="/language-spec.pdf"
                            download
@@ -90,92 +90,6 @@
                 </div>
             </div>
 
-        </div>
-
-        <!-- Language Reference -->
-        <h5 class="fw-semibold mb-3 text-muted text-uppercase" style="font-size: 0.75rem; letter-spacing: 0.08em;">
-            Language Reference
-        </h5>
-
-        <div class="card mb-3">
-            <div class="card-header fw-semibold">Statements</div>
-            <div class="card-body">
-                <table class="table table-sm mb-0">
-                    <thead>
-                        <tr>
-                            <th style="width:40%">Syntax</th>
-                            <th>Description</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr><td><code>let x;</code></td><td>Declare a variable (initialised to 0)</td></tr>
-                        <tr><td><code>let x = expr;</code></td><td>Declare and assign</td></tr>
-                        <tr><td><code>x = expr;</code></td><td>Reassign an existing variable</td></tr>
-                        <tr><td><code>output(expr);</code></td><td>Print a value to the output panel</td></tr>
-                    </tbody>
-                </table>
-            </div>
-        </div>
-
-        <div class="card mb-3">
-            <div class="card-header fw-semibold">Expressions &amp; Operators</div>
-            <div class="card-body">
-                <table class="table table-sm mb-0">
-                    <thead>
-                        <tr><th style="width:40%">Syntax</th><th>Description</th></tr>
-                    </thead>
-                    <tbody>
-                        <tr><td><code>42</code>, <code>3.14</code></td><td>Integer and float literals</td></tr>
-                        <tr><td><code>x</code></td><td>Variable reference</td></tr>
-                        <tr><td><code>a + b</code>, <code>a - b</code></td><td>Addition, subtraction</td></tr>
-                        <tr><td><code>a * b</code>, <code>a / b</code></td><td>Multiplication, division</td></tr>
-                        <tr><td><code>-x</code></td><td>Negation</td></tr>
-                        <tr><td><code>d1 + d2</code></td><td>Combine two distributions (convolution of outcomes)</td></tr>
-                    </tbody>
-                </table>
-            </div>
-        </div>
-
-        <div class="card mb-3">
-            <div class="card-header fw-semibold">Distributions</div>
-            <div class="card-body">
-                <table class="table table-sm mb-0">
-                    <thead>
-                        <tr><th style="width:40%">Syntax</th><th>Description</th></tr>
-                    </thead>
-                    <tbody>
-                        <tr>
-                            <td><code>uniform(a, b)</code></td>
-                            <td>Discrete uniform distribution over integers [a, b]</td>
-                        </tr>
-                        <tr>
-                            <td><code>uniformContinuous(a, b)</code></td>
-                            <td>Continuous uniform distribution over [a, b]</td>
-                        </tr>
-                        <tr>
-                            <td><code>Discrete(v<sub>1</sub>:p<sub>1</sub>, v<sub>2</sub>:p<sub>2</sub>, ...)</code></td>
-                            <td>Custom discrete distribution with explicit value:probability pairs</td>
-                        </tr>
-                    </tbody>
-                </table>
-            </div>
-        </div>
-
-        <div class="card mb-5">
-            <div class="card-header fw-semibold">Distribution Methods</div>
-            <div class="card-body">
-                <table class="table table-sm mb-0">
-                    <thead>
-                        <tr><th style="width:40%">Syntax</th><th>Description</th></tr>
-                    </thead>
-                    <tbody>
-                        <tr><td><code>d:expect(v)</code></td><td>P(X = v) — probability of a specific outcome</td></tr>
-                        <tr><td><code>d:min()</code></td><td>Lower bound of the distribution</td></tr>
-                        <tr><td><code>d:max()</code></td><td>Upper bound of the distribution</td></tr>
-                        <tr><td><code>d:mean()</code></td><td>Expected value (mean) of the distribution</td></tr>
-                    </tbody>
-                </table>
-            </div>
         </div>
 
     </div>

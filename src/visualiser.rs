@@ -4,7 +4,7 @@
 /// The two render functions are pure: all distribution data has already
 /// been reduced to (label, probability) pairs by the interpreter.
 
-// ── Data Types ────────────────────────────────────────────────────────────────
+// Data Types
 
 /// All the information needed to draw a histogram for one distribution.
 #[derive(Debug, Clone)]
@@ -25,7 +25,7 @@ pub enum HistKind {
     Continuous { min: f64, max: f64, mean: f64 },
 }
 
-// ── Constants ─────────────────────────────────────────────────────────────────
+// Constants
 
 /// Maximum number of bars rendered before truncating.
 const MAX_BARS: usize = 40;
@@ -50,7 +50,7 @@ const ACCENT: &str = "#6366f1";
 /// Dimmed version of the accent colour used for the bar track.
 const ACCENT_DIM: &str = "rgba(99,102,241,0.13)";
 
-// ── Helpers ───────────────────────────────────────────────────────────────────
+// Helpers
 
 /// Escape characters that are special in HTML/SVG text content.
 pub fn html_esc(s: &str) -> String {
@@ -74,7 +74,7 @@ fn fmt_f(v: f64) -> String {
     }
 }
 
-// ── CLI Renderer ──────────────────────────────────────────────────────────────
+// CLI Renderer
 
 /// Render a distribution as a plain-text ASCII histogram.
 ///
@@ -147,7 +147,7 @@ pub fn render_cli(data: &HistogramData) -> String {
     out
 }
 
-// ── SVG Renderer ──────────────────────────────────────────────────────────────
+// SVG Renderer
 
 /// Render a distribution as an inline SVG element suitable for web output.
 ///
@@ -305,7 +305,7 @@ fn render_svg_discrete(data: &HistogramData) -> String {
     s
 }
 
-// ── Shared SVG helpers ────────────────────────────────────────────────────────
+// Shared SVG helpers
 
 fn svg_open(w: i32, h: i32) -> String {
     format!(

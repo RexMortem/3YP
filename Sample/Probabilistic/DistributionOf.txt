@@ -24,7 +24,7 @@ pb function is_prime(p: int) -> bool {
     return Uncertain(true);
 }
 
-// ── Input: 53 (prime) ─────────────────────────────────────────────────────────
+// Input: 53 (prime)
 // For a prime, every round returns Uncertain(true) — the algorithm can never
 // produce a false negative.  The empirical Certain rate should be near 0.
 
@@ -45,7 +45,7 @@ let bayesian_prime = distribution_of(is_prime(53), bayesian, 200);
 output(bayesian_prime);
 output(bayesian_prime:visualise());
 
-// ── Input: 119 (composite: 7 × 17) ──────────────────────────────────────────
+// Input: 119 (composite: 7 × 17)
 // Solovay-Strassen detects most composites in the first round.
 // Only 2 Euler liars (a=1, a=118) out of 117 witnesses → per-round Certain ≈ 115/117 ≈ 98%.
 // Empirical and Bayesian should concentrate near 1.

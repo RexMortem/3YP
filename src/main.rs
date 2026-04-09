@@ -45,7 +45,7 @@ fn main() {
     }
 }
 
-// ── CLI Test Runner ───────────────────────────────────────────────────────────
+// CLI Test Runner
 
 fn run_test_suite() {
     // Silence the default panic hook so error-test panics don't spam stderr.

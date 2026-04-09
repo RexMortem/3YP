@@ -1,4 +1,4 @@
-// ── Exact equality (==) ──────────────────────────────────────────────────────
+// Exact equality (==)
 
 // Same type and same parameters → true
 let d1 = uniform(1, 6);
@@ -19,7 +19,7 @@ output(Bernoulli(0.3) == Bernoulli(0.3));
 // Bernoulli with different p → false
 output(Bernoulli(0.3) == Bernoulli(0.5));
 
-// ── Approximate equality (~=) ────────────────────────────────────────────────
+// Approximate equality (~=)
 
 // Two Binomial distributions with the same parameters → TV distance = 0 → true
 let b1 = Binomial(10, 0.5);

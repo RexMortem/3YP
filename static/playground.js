@@ -1,7 +1,6 @@
 // Sample Programs for users to try out
 
 const PROGRAMS = [
-    // ── Basics ────────────────────────────────────────────────────────────────
     {
         category: "Basics",
         name: "Arithmetic",
@@ -11,15 +10,16 @@ const PROGRAMS = [
 // Variables are declared with 'let' and assigned with '='.
 let x = 10;
 let y = 3;
-let sum = x + y;   // addition
+
+let sum  = x + y;  // addition
 let diff = x - y;  // subtraction
 let prod = x * y;  // multiplication
+
 output(sum);
 output(diff);
 output(prod);`
     },
 
-    // ── Distributions ─────────────────────────────────────────────────────────
     {
         category: "Distributions",
         name: "Fair Die (uniform)",
@@ -29,11 +29,12 @@ output(prod);`
 // uniform(a, b) creates a distribution over integers [a, b] inclusive.
 let die = uniform(1, 6);
 
-// Analytical queries on the distribution (no random sampling needed)
-let prob = die:expect(4);  // probability of rolling exactly 4 -> 1/6
-let lo   = die:min();      // lowest possible outcome            -> 1
-let hi   = die:max();      // highest possible outcome           -> 6
-let avg  = die:mean();     // expected value                     -> 3.5
+// Analytical queries on the distribution (no random sampling needed).
+let prob = die:expect(4);  // probability of rolling exactly 4
+let lo   = die:min();      // lowest possible outcome
+let hi   = die:max();      // highest possible outcome
+let avg  = die:mean();     // expected value
+
 output(prob);
 output(lo);
 output(hi);
@@ -47,10 +48,12 @@ output(avg);`
 `// A fair coin modelled as a discrete distribution.
 // Discrete(value:probability, ...) lets you assign explicit probabilities
 // to each outcome. Probabilities must sum to 1.
+// Also, you can declare Discrete across multiple lines if you prefer :) Just make sure to use semicolons to separate statements
 let coin = Discrete(0:0.5, 1:0.5);  // 0 = tails, 1 = heads
 
-// Probability that a single flip lands heads
-let heads = coin:expect(1);  // -> 0.5
+// Probability that a single flip lands heads.
+let heads = coin:expect(1);
+
 output(heads);`
     },
     {
@@ -62,31 +65,34 @@ output(heads);`
 // uniformContinuous(a, b) models a real-valued random variable.
 let d = uniformContinuous(0, 10);
 
-let lo  = d:min();   // lower bound  -> 0
-let hi  = d:max();   // upper bound  -> 10
-let avg = d:mean();  // midpoint     -> 5
+let lo  = d:min(); // 0
+let hi  = d:max(); // 10
+let avg = d:mean(); // 5
+
 output(lo);
 output(hi);
 output(avg);`
     },
     {
         category: "Distributions",
-        name: "Loaded Die (discrete)",
+        name: "Loaded/Biased Die (discrete)",
         icon: "bi-dice-6-fill",
         code:
 `// A biased die where face 6 comes up half the time.
 // Each face gets an explicit probability via Discrete(...).
+// As with the Coin Flip example, you can declare Discrete on one line if you prefer.
 let loaded = Discrete(
-    1:0.1,  // 10% chance
+    1:0.1,
     2:0.1,
     3:0.1,
     4:0.1,
     5:0.1,
-    6:0.5   // 50% chance
+    6:0.5
 );
 
-// Probability of rolling a 6
-let prob6 = loaded:expect(6);  // -> 0.5
+// Probability of rolling a 6.
+let prob6 = loaded:expect(6);
+
 output(prob6);`
     },
     {
@@ -95,19 +101,18 @@ output(prob6);`
         icon: "bi-toggle-on",
         code:
 `// A Bernoulli distribution models a single trial with two outcomes:
-// true (success) with probability p, false (failure) with probability 1-p.
-// Here p = 0.7 means a 70% success rate.
+// true (success) with probability p, false with probability 1-p.
 let trial = Bernoulli(0.7);
 
-// Expected value (= probability of success)
-let avg = trial:mean();  // -> 0.7
+// Expected value (equal to probability of success).
+let avg = trial:mean();
 output(avg);
 
-// Probability of success
-let p_success = trial:expect(1);  // -> 0.7
+// Probability of success.
+let p_success = trial:expect(1);
 output(p_success);
 
-// Sample one outcome randomly (true or false)
+// Sample one outcome randomly.
 let outcome = trial.sample();
 output(outcome);`
     },
@@ -118,18 +123,18 @@ output(outcome);`
         code:
 `// A Binomial distribution counts the number of successes in n independent
 // Bernoulli trials, each with success probability p.
-// Binomial(10, 0.5) ~ "how many heads in 10 fair coin flips?"
+// Binomial(10, 0.5): This could be "how many heads are in 10 fair coin flips"?
 let flips = Binomial(10, 0.5);
 
-// Expected number of successes = n * p = 5
-let avg = flips:mean();  // -> 5
+// Expected number of successes is n * p = 5.
+let avg = flips:mean();
 output(avg);
 
-// Probability of getting exactly 5 heads
+// Probability of getting exactly 5 heads.
 let p5 = flips:expect(5);
 output(p5);
 
-// Sample one outcome (a count from 0 to 10)
+// Sample one outcome (a count from 0 to 10).
 let count = flips.sample();
 output(count);`
     },
@@ -139,128 +144,133 @@ output(count);`
         icon: "bi-skip-forward",
         code:
 `// A Geometric distribution models the number of Bernoulli trials needed
-// until the first success. Geometric(0.5) ~ "how many flips until heads?"
+// until the first success. Geometric(0.5): This could be "how many flips until heads"?
 let wait = Geometric(0.5);
 
-// Expected waiting time = 1/p = 2
-let avg = wait:mean();  // -> 2
+// Expected waiting time is 1/p = 2 (this is from expected value of geometric dist formula: 1/p)
+let avg = wait:mean();
 output(avg);
 
-// Probability that the first success happens on trial 1
-let p1 = wait:expect(1);  // -> 0.5
+// Probability that the first success happens on trial 1.
+let p1 = wait:expect(1);
 output(p1);
 
-// Sample one outcome (always >= 1)
+// Sample one outcome (always at least 1).
 let trials = wait.sample();
 output(trials);`
     },
 
-    // ── Advanced ──────────────────────────────────────────────────────────────
     {
         category: "Advanced",
         name: "Two Dice Sum",
         icon: "bi-plus-slash-minus",
         code:
-`// Combine two independent fair dice analytically.
-// Adding two distributions produces a new distribution over their summed outcomes.
+`// Combine two independent fair dice analytically (the new distribution's properties are a direct result of the individual distribution's properties).
+// Adding two distributions produces a new distribution over their summed
+// outcomes.
 let d1 = uniform(1, 6);
 let d2 = uniform(1, 6);
+
 let two_dice = d1 + d2;  // distribution over sums 2..12
 
-// Probability of rolling a total of 7 (the most likely sum)
-let prob7 = two_dice:expect(7);  // -> 6/36 ≈ 0.1667
+// Probability of rolling a total of 7 (the most likely sum).
+let prob7 = two_dice:expect(7);
+
 output(prob7);`
     },
     {
         category: "Advanced",
-        name: "Functions",
+        name: "Deterministic Functions",
         icon: "bi-braces",
         code:
 `// Regular deterministic functions are declared with 'fn'.
-// Parameters have type annotations (name: type).
+// Parameters have type annotations of the form 'name: type'.
 fn sum(a: int, b: int) -> int {
     return a + b;
 }
 
-// Recursive functions work too
+// Recursive functions are supported.
 fn factorial(n: int) -> int {
     if n == 0 { return 1; };
     return n * factorial(n - 1);
 }
 
-// Boolean expressions and modulo
+// Boolean expressions and modulo.
 fn is_even(n: int) -> bool {
     return n % 2 == 0;
 }
 
-output(sum(3, 4));        // -> 7
-output(factorial(6));     // -> 720
-output(is_even(42));      // -> true
-output(is_even(7));       // -> false`
+output(sum(3, 4));
+output(factorial(6));
+output(is_even(42));
+output(is_even(7));`
     },
 
-    // ── Probabilistic Functions ───────────────────────────────────────────────
     {
         category: "Probabilistic Functions",
         name: "Fermat Compositeness (coRP)",
         icon: "bi-x-circle",
         code:
-`// Fermat Compositeness Test — a classic coRP algorithm.
+`// Fermat Compositeness Test: a classic coRP algorithm.
 //
-// Fermat's little theorem: if p is prime, a^(p-1) ≡ 1 (mod p) for all valid a.
-// Contrapositive: if a^(n-1) ≢ 1 (mod n), then n is DEFINITELY composite.
-// Such an 'a' is called a Fermat witness.
+// Fermat's little theorem: if p is prime, then a^(p-1) is congruent to 1
+// (mod p) for all valid a. The contrapositive gives a one-sided test for
+// compositeness; an 'a' that violates the theorem is called a Fermat witness.
 //
-// Error class: coRP — "yes, it IS composite" is always correct.
-//   Certain(true)   = Fermat witness found  -> definitely composite (never wrong)
-//   Uncertain(false) = no witness found     -> probably prime (may miss Carmichael numbers)
+// Error class: coRP. "Yes, it IS composite" is always correct.
+//   Certain(true)    : Fermat witness found, definitely composite.
+//   Uncertain(false) : no witness found, probably prime.
 //
-// Limitation: Carmichael numbers (e.g. 561 = 3x11x17) have no Fermat witnesses
-// and always fool this test. Solovay-Strassen does not have this weakness.
+// Limitation: Carmichael numbers (e.g. 561 = 3 * 11 * 17) have no Fermat
+// witnesses and always fool this test. Solovay-Strassen is stronger.
+
 pb function is_composite(n: int) -> bool {
     error_class: coRP,
     error_distribution: Geometric
 } {
-    if n < 2 { return Certain(true); };
-    if n == 2 { return Uncertain(false); };
-    if n == 3 { return Uncertain(false); };
+    if n < 2     { return Certain(true); };
+    if n == 2    { return Uncertain(false); };
+    if n == 3    { return Uncertain(false); };
     if n % 2 == 0 { return Certain(true); };
 
     a = uniform(2, n - 2).sample();
+
     if mod_exp(a, n - 1, n) != 1 { return Certain(true); };
     return Uncertain(false);
 }
 
-// 53 is prime: no witness exists, all rounds return Uncertain(false)
+// 53 is prime: no witness exists, all rounds return Uncertain(false).
 let r1, info1 = is_composite(53) with confidence >= 0.99;
-output(r1);     // -> false
-output(info1);  // -> Info { rounds: 7, confidence: 0.992188 }
+output(r1);
+output(info1);
 
-// 119 = 7 x 17: Fermat witness found in first round -> Certain(true)
+// 119 = 7 * 17: a Fermat witness is found in the first round.
 let r2, info2 = is_composite(119) with confidence >= 0.99;
-output(r2);     // -> true
-output(info2);  // -> Info { rounds: 1, confidence: 1.000000 }`
+output(r2);
+output(info2);`
     },
     {
         category: "Probabilistic Functions",
         name: "Bias Detection (BPP)",
         icon: "bi-activity",
         code:
-`// Randomized Bias Detection — a BPP algorithm.
+`// Randomised Bias Detection: a BPP algorithm.
 //
-// Problem: is coin bias p >= 0.5 (heads-biased) or p < 0.5 (tails-biased)?
-// Each round samples the coin and casts a vote. After k rounds, majority wins.
+// Problem: is the coin bias p >= 0.5 (heads-biased) or p < 0.5 (tails-biased)?
+// Each round samples the coin once and casts a vote. After k rounds the
+// runner takes the majority vote.
 //
-// Error class: BPP — two-sided errors (neither direction is guaranteed correct).
-//   Uncertain(true)  = "I think heads-biased" (may be wrong)
-//   Uncertain(false) = "I think tails-biased" (may be wrong)
+// Error class: BPP. Errors are two-sided: neither direction is guaranteed
+// correct on a single round.
+//   Uncertain(true)  : "I think heads-biased" (may be wrong).
+//   Uncertain(false) : "I think tails-biased" (may be wrong).
 //
-// With p = 0.75, per-round success = 3/4 (the standard BPP assumption).
-// BPP round count: k = ceil(-8 * ln(1 - c)).
-// For confidence 0.99: k = 37 rounds vs 7 for RP/coRP.
-//
-// Contrast with Solovay-Strassen (RP): Certain(false) for composites is NEVER
-// wrong. BPP has no such guarantee; only the majority vote provides confidence.
+// With p = 0.75 the per-round success probability is exactly 3/4, the
+// standard BPP assumption. The BPP round count formula is
+//   k = ceil(-8 * ln(1 - c))
+// so confidence 0.99 needs 37 rounds, against 7 for an RP/coRP algorithm
+// at the same target.
+
 pb function is_biased_up(p: float) -> bool {
     error_class: BPP,
     error_distribution: Binomial
@@ -270,43 +280,45 @@ pb function is_biased_up(p: float) -> bool {
     return Uncertain(false);
 }
 
-// p = 0.75: biased toward heads; per-round success exactly 3/4
+// p = 0.75: biased toward heads, per-round success exactly 3/4.
 let r1, info1 = is_biased_up(0.75) with confidence >= 0.99;
-output(r1);     // -> true
-output(info1);  // -> Info { rounds: 37, confidence: ~0.990 }
+output(r1);
+output(info1);
 
-// p = 0.25: biased toward tails; majority of rounds vote Uncertain(false)
+// p = 0.25: biased toward tails, majority of rounds vote false.
 let r2, info2 = is_biased_up(0.25) with confidence >= 0.99;
-output(r2);     // -> false
-output(info2);  // -> Info { rounds: 37, confidence: ~0.990 }`
+output(r2);
+output(info2);`
     },
     {
         category: "Probabilistic Functions",
-        name: "map — Prime Sieve",
+        name: "Prime Sieve (map)",
         icon: "bi-grid-3x3",
         code:
 `// map() applies a function to every element of an array.
 //
 // With 'with confidence >= c', the error budget is split evenly across
 // all n elements using the union bound:
+//
 //   per-element confidence = 1 - (1 - c) / n
 //
 // This guarantees: P(any element in the result is wrong) <= 1 - c.
-//
-// For 9 elements at 0.99 overall confidence:
-//   per-element confidence ≈ 0.9989  ->  10 rounds each via RP formula.
+
 pb function is_prime(p: int) -> bool {
     error_class: RP,
     error_distribution: Geometric
 } {
-    if p < 2 { return Certain(false); };
-    if p == 2 { return Certain(true); };
+    if p < 2     { return Certain(false); };
+    if p == 2    { return Certain(true); };
     if p % 2 == 0 { return Certain(false); };
+
     a = uniform(1, p - 1).sample();
     jacobian = (p + jacobi(a, p)) % p;
     euler = mod_exp(a, (p - 1) / 2, p);
-    if jacobian == 0 { return Certain(false); };
-    if euler != jacobian { return Certain(false); };
+
+    if jacobian == 0          { return Certain(false); };
+    if euler != jacobian      { return Certain(false); };
+
     return Uncertain(true);
 }
 
@@ -314,143 +326,135 @@ pb function is_prime(p: int) -> bool {
 // The 0.99 confidence budget is divided across all 9 elements.
 let primes = map(is_prime, [2, 3, 4, 5, 6, 7, 8, 9, 10]) with confidence >= 0.99;
 output(primes);
-// -> [true, true, false, true, false, true, false, false, false]
 
-// map also works with regular functions — no confidence needed.
+// map also works with regular functions, in which case no confidence is needed.
 fn double(n: int) -> int { return n * 2; }
-let doubled = map(double, [1, 2, 3, 4, 5]);
-output(doubled);
-// -> [2, 4, 6, 8, 10]
 
-// sample() works with colon syntax, just like mean/expect/min/max.
-let die = uniform(1, 6);
-output(die:mean());    // -> 3.5  (analytical)
-output(die:sample());  // -> random value in [1, 6]`
+let doubled = map(double, [1, 2, 3, 4, 5]);
+output(doubled);`
     },
     {
         category: "Probabilistic Functions",
         name: "Solovay-Strassen Primality",
         icon: "bi-shuffle",
         code:
-`// Solovay-Strassen primality test - a classic RP algorithm.
+`// Solovay-Strassen primality test: a classic RP algorithm.
 //
 // Error class RP means:
 //   - A "false" answer is ALWAYS correct (no false negatives).
-//   - A "true" answer might be wrong, but with probability <= (1/2)^k
+//   - A "true" answer might be wrong, but with probability at most (1/2)^k
 //     after k rounds. Each additional round halves the error.
 //
-// The runtime automatically chooses the minimum number of rounds
-// needed to meet the confidence level you request.
+// The runtime automatically chooses the minimum number of rounds needed to
+// meet the confidence level you request.
 
 pb function is_prime(p: int) -> bool {
     error_class: RP,
     error_distribution: Geometric
 } {
-    // Deterministic edge cases answered immediately with full confidence
-    if p < 2 { return Certain(false); };
-    if p == 2 { return Certain(true); };
+    // Deterministic edge cases, answered immediately with full confidence.
+    if p < 2      { return Certain(false); };
+    if p == 2     { return Certain(true); };
     if p % 2 == 0 { return Certain(false); };
 
-    // Pick a random witness a in [1, p-1]
+    // Pick a random witness a in [1, p-1].
     a = uniform(1, p - 1).sample();
 
     // Normalise the Jacobi symbol to [0, p-1]:
-    // jacobi returns -1, 0, or 1; adding p maps -1 -> p-1
+    // jacobi returns -1, 0, or 1; adding p maps -1 to p-1.
     jacobian = (p + jacobi(a, p)) % p;
 
-    // Euler's criterion: a^((p-1)/2) mod p
+    // Euler's criterion: a^((p-1)/2) mod p.
     euler = mod_exp(a, (p - 1) / 2, p);
 
-    // jacobian == 0 or mismatch means a factor was found -> composite
-    if jacobian == 0 { return Certain(false); };
+    // jacobian == 0 or a mismatch means a factor was found, so composite.
+    if jacobian == 0     { return Certain(false); };
     if euler != jacobian { return Certain(false); };
 
-    // All checks passed - probably prime
     return Uncertain(true);
 }
 
-// Test a prime: 53
-// 'info' reports how many rounds were run and the achieved confidence
+// Test a prime: 53.
+// 'info' reports how many rounds were run and the achieved confidence.
 let r1, info1 = is_prime(53) with confidence >= 0.999;
-output(r1);     // -> true
-output(info1);  // -> Info { rounds: 10, confidence: 0.999023 }
+output(r1);
+output(info1);
 
-// Test a composite: 15 = 3 x 5
-// NOTE: We're using worst-case confidence bounds here
-// This means that 15 being prime with 50% probability is actually
-// much lower - perhaps 
+// Test a composite: 15 = 3 * 5.
+// Note: this uses the worst-case confidence bound, so the reported confidence
+// is a lower bound on the truth.
 let r2, info2 = is_prime(15) with confidence >= 0.5;
-output(r2);     // -> false
-output(info2);  // -> Info { rounds: 1, confidence: 1.000000 }
+output(r2);
+output(info2);
 
-// Test an even composite: 52
+// Test an even composite: 52.
 let r3, info3 = is_prime(52) with confidence >= 0.999;
-output(r3);     // -> false
-output(info3);  // -> Info { rounds: 1, confidence: 1.000000 }`
+output(r3);
+output(info3);`
     },
-
     {
         category: "Probabilistic Functions",
-        name: "distribution_of — Underlying Distribution",
+        name: "Underlying Distribution (distribution_of)",
         icon: "bi-diagram-3",
         code:
-`// distribution_of() reveals the implicit per-round distribution of a pb function.
+`// distribution_of() reveals the implicit per-round distribution of a
+// probabilistic function.
 //
 // Every pb function samples a hidden distribution on each round:
-//   Certain(x)  — definitive answer (correct with probability 1)
-//   Uncertain(x) — probabilistic answer (may be wrong)
+//   Certain(x)   : definitive answer (correct with probability 1).
+//   Uncertain(x) : probabilistic answer (may be wrong).
 //
 // The per-round probability of returning Certain is the key quantity.
 // distribution_of() exposes this three ways:
 //
-//   analytical  — derived purely from the error class (no sampling)
-//   empirical   — estimated by running N independent single rounds
-//   bayesian    — Beta posterior after N rounds with uniform prior Beta(1,1)
+//   analytical : derived purely from the error class (no sampling).
+//   empirical  : estimated by running N independent single rounds.
+//   bayesian   : Beta posterior after N rounds with uniform prior Beta(1,1).
 
 pb function is_prime(p: int) -> bool {
     error_class: RP,
     error_distribution: Geometric
 } {
-    if p < 2 { return Certain(false); };
-    if p == 2 { return Certain(true); };
+    if p < 2      { return Certain(false); };
+    if p == 2     { return Certain(true); };
     if p % 2 == 0 { return Certain(false); };
+
     a = uniform(1, p - 1).sample();
     jacobian = (p + jacobi(a, p)) % p;
     euler = mod_exp(a, (p - 1) / 2, p);
-    if jacobian == 0 { return Certain(false); };
+
+    if jacobian == 0     { return Certain(false); };
     if euler != jacobian { return Certain(false); };
+
     return Uncertain(true);
 }
 
-// ── Composite input: 119 = 7 × 17 ────────────────────────────────────────────
-// 115 out of 117 witnesses detect 119 as composite on the first try.
-// The per-round Certain probability should be very close to 1.
+// Composite input: 119 = 7 * 17.
+// Almost every witness detects 119 as composite on the first try, so the
+// per-round Certain probability should be very close to 1.
 
-// Analytical: RP worst-case → rounds-until-Certain ~ Geometric(0.5)
+// Analytical: RP worst case gives rounds-until-Certain ~ Geometric(0.5).
 let d_analytic = distribution_of(is_prime(119), analytical);
 output(d_analytic:visualise());
 
 // Empirical: run 300 rounds and count definitive vs uncertain answers.
-// For composite 119, nearly every round returns Certain(false) immediately.
 let d_empirical = distribution_of(is_prime(119), empirical, 300);
-output(d_empirical);         // -> Bernoulli(~0.98)
+output(d_empirical);
 output(d_empirical:visualise());
 
 // Bayesian: Beta posterior over the true per-round Certain probability.
-// 300 rounds → posterior concentrates near 1 for this highly-detectable composite.
 let d_bayesian = distribution_of(is_prime(119), bayesian, 300);
-output(d_bayesian);          // -> Beta(~296, ~5)
+output(d_bayesian);
 output(d_bayesian:visualise());
 
-// ── Prime input: 53 ──────────────────────────────────────────────────────────
-// Every round returns Uncertain(true) — the algorithm never falsely rejects a prime.
-// The per-round Certain probability should be near 0.
-
+// Prime input: 53.
+// Every round returns Uncertain(true), so the per-round Certain probability
+// should be near 0.
 let d_prime = distribution_of(is_prime(53), bayesian, 200);
-output(d_prime);             // -> Beta(1, ~201)  — concentrated near 0
+output(d_prime);
 output(d_prime:visualise());`
     },
-    // ── Visualisations ────────────────────────────────────────────────────────
+
     {
         category: "Visualisations",
         name: "Discrete Distributions",
@@ -460,34 +464,34 @@ output(d_prime:visualise());`
 // The widest bar always represents the most probable outcome.
 // Works on any discrete distribution.
 
-// Fair six-sided die
+// Fair six-sided die.
 let die = uniform(1, 6);
 output(die:visualise());
 
-// Biased coin: 70% heads, 30% tails
+// Biased coin: 70% heads, 30% tails.
 let coin = Discrete(0:0.3, 1:0.7);
 output(coin:visualise());
 
-// Loaded die: face 6 is twice as likely as any other face
+// Loaded die: face 6 is much more likely than any other face.
 let loaded = Discrete(1:0.1, 2:0.1, 3:0.1, 4:0.1, 5:0.1, 6:0.5);
 output(loaded:visualise());`
     },
     {
         category: "Visualisations",
-        name: "Combined & Named Distributions",
+        name: "Combined and Named Distributions",
         icon: "bi-graph-up",
         code:
-`// Combining two dice produces a new distribution whose PMF has a bell-curve
-// shape — visualise() makes this immediately visible.
+`// Combining two dice produces a new distribution whose PMF has a
+// triangular shape; visualise() makes this immediately visible.
 let d1 = uniform(1, 6);
 let d2 = uniform(1, 6);
 output((d1 + d2):visualise());
 
-// Binomial(10, 0.5): count of heads in 10 fair flips
+// Binomial(10, 0.5): count of heads in 10 fair flips.
 let flips = Binomial(10, 0.5);
 output(flips:visualise());
 
-// Geometric(0.3): waiting time until first success
+// Geometric(0.3): waiting time until first success.
 let wait = Geometric(0.3);
 output(wait:visualise());`
     },
@@ -501,11 +505,11 @@ output(wait:visualise());`
 let c = uniformContinuous(2.5, 7.5);
 output(c:visualise());
 
-// You can mix text output and visualisations freely.
+// Text output and visualisations can be mixed freely.
 let d = uniform(1, 6);
-output(d:mean());     // 3.5
+output(d:mean());
 output(d:visualise());
-output(d:expect(3));  // 0.1667`
+output(d:expect(3));`
     },
 ];
 

@@ -1,6 +1,6 @@
 use std::fmt;
 
-// ── Type System ──────────────────────────────────────────────────────────────
+// Type System
 
 #[derive(Debug, Clone, PartialEq)]
 pub enum Type {
@@ -25,7 +25,7 @@ impl fmt::Display for Type {
     }
 }
 
-// ── Enum Definitions ─────────────────────────────────────────────────────────
+// Enum Definitions
 
 /// A user-defined enumeration type declaration.
 /// e.g. `enum Weather { Sunny, Cloudy, Rainy }`
@@ -36,7 +36,7 @@ pub struct EnumDef {
     pub variants: Vec<String>,
 }
 
-// ── Error Classification ─────────────────────────────────────────────────────
+// Error Classification
 
 /// Error class for probabilistic functions, determining how multiple rounds combine.
 #[derive(Debug, Clone)]
@@ -62,7 +62,7 @@ impl fmt::Display for ErrorClass {
     }
 }
 
-// ── Function Definitions ─────────────────────────────────────────────────────
+// Function Definitions
 
 #[derive(Debug, Clone)]
 pub struct FuncParam {
@@ -91,7 +91,7 @@ pub struct PbFuncDef {
     pub body: Vec<Statement>,
 }
 
-// ── Top-Level Program Items ──────────────────────────────────────────────────
+// Top-Level Program Items
 
 #[derive(Debug, Clone)]
 pub enum ProgramItem {
@@ -101,7 +101,7 @@ pub enum ProgramItem {
     EnumDef(EnumDef),
 }
 
-// ── Distributions ────────────────────────────────────────────────────────────
+// Distributions
 
 #[derive(Debug, Clone)]
 pub enum Dist {
@@ -109,7 +109,6 @@ pub enum Dist {
     UniformContinuous(Box<Expr>, Box<Expr>),  // start, end (continuous)
     Discrete(Vec<(Box<Expr>, Box<Expr>)>),   // value:probability pairs
     CombinedDist(Box<Dist>, Box<Dist>),      // sum of two independent distributions
-    ChainDist(Box<Dist>, u64, Box<Dist>),    // iterations of chained distributions
     Bernoulli(Box<Expr>),                    // p: probability of true
     Binomial(Box<Expr>, Box<Expr>),          // n: trials, p: success probability
     Geometric(Box<Expr>),                    // p: success probability per trial
@@ -118,7 +117,7 @@ pub enum Dist {
     Beta(Box<Expr>, Box<Expr>),              // alpha, beta
 }
 
-// ── Distribution-of Extraction Mode ─────────────────────────────────────────
+// Distribution-of Extraction Mode
 
 /// How to extract the underlying distribution of a probabilistic function.
 #[derive(Debug, Clone)]
@@ -131,7 +130,7 @@ pub enum DistributionOfMode {
     Bayesian(i64),
 }
 
-// ── Statements ───────────────────────────────────────────────────────────────
+// Statements
 
 #[derive(Debug, Clone)]
 pub enum Statement {
@@ -179,7 +178,7 @@ pub enum Statement {
     },
 }
 
-// ── Expressions ──────────────────────────────────────────────────────────────
+// Expressions
 
 #[derive(Debug, Clone)]
 pub enum Expr {
@@ -217,6 +216,7 @@ pub enum Expr {
         method: String,
         args: Vec<Expr>,
     },
+
     // method call on any expression value (`.` syntax, e.g. `uniform(1,6).sample()`)
     ExprMethodCall {
         expr: Box<Expr>,
@@ -242,7 +242,7 @@ pub enum Expr {
     ApproxEq(Box<Expr>, Box<Expr>, Option<Box<Expr>>),
 }
 
-// ── Display Helpers ──────────────────────────────────────────────────────────
+// Display Helpers
 
 pub fn format_dist(dist: &Dist) -> String {
     match dist {
@@ -256,7 +256,6 @@ pub fn format_dist(dist: &Dist) -> String {
             format!("Discrete({})", pair_strs.join(", "))
         }
         Dist::CombinedDist(d1, d2) => format!("({} + {})", format_dist(d1), format_dist(d2)),
-        Dist::ChainDist(d1, n, d2) => format!("{}[{}]{}", format_dist(d1), n, format_dist(d2)),
         Dist::Bernoulli(p) => format!("Bernoulli({})", p),
         Dist::Binomial(n, p) => format!("Binomial({}, {})", n, p),
         Dist::Geometric(p) => format!("Geometric({})", p),

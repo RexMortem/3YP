@@ -1,4 +1,4 @@
-// ── Trivial RP Algorithm: Coin Never Heads ────────────────────────────────────
+// Trivial RP Algorithm: Coin Never Heads
 //
 // Claim: "this coin NEVER lands heads."
 //
@@ -31,7 +31,7 @@ pb function never_heads(p: float) -> bool {
     return Uncertain(true);
 }
 
-// ── Example 1: fair coin (p = 0.5) ───────────────────────────────────────────
+// Example 1: fair coin (p = 0.5)
 // True answer: "no" (a fair coin CAN land heads).
 // Each round has 50% chance of Certain(false).
 // Expected: result = false, very few rounds needed.
@@ -39,14 +39,14 @@ let r1, i1 = never_heads(0.5) with confidence >= 0.9;
 output(r1);    // false — fair coins can land heads
 output(i1);
 
-// ── Example 2: heavily biased toward heads (p = 0.9) ─────────────────────────
+// Example 2: heavily biased toward heads (p = 0.9)
 // True answer: "no" (a 90%-heads coin can land heads).
 // Each round has 90% chance of Certain(false). Should resolve in 1 round.
 let r2, i2 = never_heads(0.9) with confidence >= 0.9;
 output(r2);    // false — this coin almost certainly lands heads every round
 output(i2);
 
-// ── Example 3: simulate a "never-heads" coin using p = 0.001 ─────────────────
+// Example 3: simulate a "never-heads" coin using p = 0.001
 // True answer: "yes" (almost never lands heads for practical purposes).
 // Each round has 0.1% chance of Certain(false), 99.9% Uncertain(true).
 // Runner accumulates Uncertain(true) and returns true with target confidence.

@@ -8,7 +8,7 @@ use rand::Rng;
 use crate::ast::*;
 use crate::visualiser::{self, HistogramData, HistKind};
 
-// ── Runtime Value ─────────────────────────────────────────────────────────────
+// Runtime Value
 
 #[derive(Debug, Clone)]
 pub enum RuntimeValue {
@@ -36,7 +36,7 @@ pub enum RuntimeValue {
     DynDist(Vec<(RuntimeValue, f64)>),
 }
 
-// ── Output Line ───────────────────────────────────────────────────────────────
+// Output Line
 
 /// A single item in the program's output stream.
 /// Text lines are printed as-is; histograms are rendered differently for CLI
@@ -102,14 +102,14 @@ impl fmt::Display for RuntimeValue {
     }
 }
 
-// ── Flow Control ──────────────────────────────────────────────────────────────
+// Flow Control
 
 enum FlowControl {
     Continue,
     Return(RuntimeValue),
 }
 
-// ── Runtime Environment ───────────────────────────────────────────────────────
+// Runtime Environment
 
 struct RuntimeEnv {
     /// All runtime values (scalars, booleans, distributions) keyed by name.
@@ -159,7 +159,7 @@ impl RuntimeEnv {
         }
     }
 
-    // ── Fraction Helpers ──────────────────────────────────────────────────────
+    // Fraction Helpers
 
     /// Convert a user-specified `f64` (parsed from source like `0.5`, `0.1`) to an
     /// exact `Fraction`.  Uses the shortest decimal string representation so that
@@ -211,7 +211,7 @@ impl RuntimeEnv {
         result
     }
 
-    // ── Expression Evaluation ─────────────────────────────────────────────────
+    // Expression Evaluation
 
     fn eval_expr(&self, expr: &Expr) -> RuntimeValue {
         match expr {
@@ -232,7 +232,7 @@ impl RuntimeEnv {
                     }
                 }),
 
-            // ── Unary ─────────────────────────────────────────────────────────
+            // Unary
             Expr::Neg(inner) => match self.eval_expr(inner) {
                 RuntimeValue::Int(n) => RuntimeValue::Int(-n),
                 RuntimeValue::Float(n) => RuntimeValue::Float(-n),
@@ -243,7 +243,7 @@ impl RuntimeEnv {
                 v => panic!("Type error: '!' requires bool, got {}", v),
             },
 
-            // ── Arithmetic ────────────────────────────────────────────────────
+            // Arithmetic
             Expr::Add(a, b) => match (self.eval_expr(a), self.eval_expr(b)) {
                 (RuntimeValue::Int(x), RuntimeValue::Int(y)) => RuntimeValue::Int(x + y),
                 (RuntimeValue::Float(x), RuntimeValue::Float(y)) => RuntimeValue::Float(x + y),
@@ -307,7 +307,7 @@ impl RuntimeEnv {
                 (a, b) => panic!("Type error: cannot compute {} mod {}", a, b),
             },
 
-            // ── Comparison ────────────────────────────────────────────────────
+            // Comparison
             Expr::Eq(a, b) => RuntimeValue::Bool(self.eval_numeric_eq(a, b)),
             Expr::Neq(a, b) => RuntimeValue::Bool(!self.eval_numeric_eq(a, b)),
             Expr::Lt(a, b) => RuntimeValue::Bool(self.eval_expr(a).as_f64() < self.eval_expr(b).as_f64()),
@@ -315,7 +315,7 @@ impl RuntimeEnv {
             Expr::Gt(a, b) => RuntimeValue::Bool(self.eval_expr(a).as_f64() > self.eval_expr(b).as_f64()),
             Expr::Gte(a, b) => RuntimeValue::Bool(self.eval_expr(a).as_f64() >= self.eval_expr(b).as_f64()),
 
-            // ── Logical ───────────────────────────────────────────────────────
+            // Logical
             Expr::And(a, b) => match (self.eval_expr(a), self.eval_expr(b)) {
                 (RuntimeValue::Bool(x), RuntimeValue::Bool(y)) => RuntimeValue::Bool(x && y),
                 (a, b) => panic!("Type error: '&&' requires bool operands, got {} and {}", a, b),
@@ -325,12 +325,12 @@ impl RuntimeEnv {
                 (a, b) => panic!("Type error: '||' requires bool operands, got {} and {}", a, b),
             },
 
-            // ── Arrays ────────────────────────────────────────────────────────
+            // Arrays
             Expr::Array(elems) => {
                 RuntimeValue::Array(elems.iter().map(|e| self.eval_expr(e)).collect())
             }
 
-            // ── Distributions ─────────────────────────────────────────────────
+            // Distributions
             Expr::Dist(d) => RuntimeValue::Dist(d.clone()),
 
             Expr::DistMethodCall { var, method, args } => {
@@ -352,14 +352,14 @@ impl RuntimeEnv {
                 }
             }
 
-            // ── Certainty markers ─────────────────────────────────────────────
+            // Certainty markers
             Expr::Certain(inner) => RuntimeValue::Certain(Box::new(self.eval_expr(inner))),
             Expr::Uncertain(inner) => RuntimeValue::Uncertain(Box::new(self.eval_expr(inner))),
 
-            // ── Function calls ────────────────────────────────────────────────
+            // Function calls
             Expr::FuncCall(name, args) => self.eval_func_call(name, args),
 
-            // ── Approximate equality ──────────────────────────────────────────
+            // Approximate equality
             Expr::ApproxEq(a, b, tol_expr) => {
                 let tolerance = tol_expr
                     .as_ref()
@@ -387,7 +387,7 @@ impl RuntimeEnv {
         }
     }
 
-    // ── Distribution Equality ─────────────────────────────────────────────────
+    // Distribution Equality
 
     /// Exact structural equality: same distribution type and identical evaluated parameters.
     fn dist_exact_eq(&self, d1: &Dist, d2: &Dist) -> bool {
@@ -445,7 +445,6 @@ impl RuntimeEnv {
             | Dist::Binomial(_,_) | Dist::Geometric(_) => true,
             Dist::CombinedDist(d1, d2) => self.dist_is_discrete(d1) && self.dist_is_discrete(d2),
             Dist::UniformContinuous(_,_) | Dist::Beta(_,_) => false,
-            Dist::ChainDist(_,_,_) => false,
         }
     }
 
@@ -570,7 +569,7 @@ impl RuntimeEnv {
         }
     }
 
-    // ── Markov Chain / Dynamic Distribution Helpers ───────────────────────────
+    // Markov Chain / Dynamic Distribution Helpers
 
     /// A stable key for merging outcomes in bind/step.
     /// Uses "TypeName::Variant" for enum variants to avoid cross-enum collisions.
@@ -719,7 +718,7 @@ impl RuntimeEnv {
         }
     }
 
-    // ── Distribution Methods ──────────────────────────────────────────────────
+    // Distribution Methods
 
     fn eval_dist_method(&self, dist: &Dist, method: &str, args: &[Expr]) -> RuntimeValue {
         match method {
@@ -812,7 +811,6 @@ impl RuntimeEnv {
                 }
                 prob
             }
-            Dist::ChainDist(_, _, _) => panic!("ChainDist probability calculation not implemented"),
             Dist::Bernoulli(p_expr) => {
                 let p = Self::float_to_frac(self.eval_expr(p_expr).as_f64());
                 match target {
@@ -876,7 +874,6 @@ impl RuntimeEnv {
                 }
                 out
             }
-            Dist::ChainDist(_, _, _) => panic!("ChainDist not implemented"),
             Dist::Beta(_, _) => panic!("Beta distribution is continuous; cannot enumerate discrete outcomes"),
             Dist::Bernoulli(p_expr) => {
                 let p = Self::float_to_frac(self.eval_expr(p_expr).as_f64());
@@ -919,7 +916,7 @@ impl RuntimeEnv {
         }
     }
 
-    // ── Histogram Construction ────────────────────────────────────────────────
+    // Histogram Construction
 
     /// Build a `HistogramData` from any distribution for use by `:visualise()`.
     fn build_histogram_data(&self, dist: &Dist) -> HistogramData {
@@ -980,7 +977,7 @@ impl RuntimeEnv {
         }
     }
 
-    // ── Sampling ──────────────────────────────────────────────────────────────
+    // Sampling
 
     fn sample_dist(&self, dist: &Dist) -> RuntimeValue {
         let mut rng = rand::thread_rng();
@@ -1048,7 +1045,6 @@ impl RuntimeEnv {
                     (a, b) => panic!("Cannot combine distribution samples {:?} and {:?}", a, b),
                 }
             }
-            Dist::ChainDist(_, _, _) => panic!("ChainDist sampling not implemented"),
             Dist::Beta(alpha_expr, beta_expr) => {
                 let alpha = self.eval_expr(alpha_expr).as_f64();
                 let beta  = self.eval_expr(beta_expr).as_f64();
@@ -1057,10 +1053,10 @@ impl RuntimeEnv {
         }
     }
 
-    // ── Built-in & User Function Calls ────────────────────────────────────────
+    // Built-in & User Function Calls
 
     fn eval_func_call(&self, name: &str, args: &[Expr]) -> RuntimeValue {
-        // ── Markov chain special forms ────────────────────────────────────────
+        // Markov chain special forms
         // These are handled before evaluating args because the second argument
         // is a function name (an identifier), not a value.
 
@@ -1092,7 +1088,7 @@ impl RuntimeEnv {
         let eval_args: Vec<RuntimeValue> = args.iter().map(|a| self.eval_expr(a)).collect();
 
         match name {
-            // ── Built-ins ─────────────────────────────────────────────────────
+            // Built-ins
             "jacobi" => {
                 if eval_args.len() != 2 {
                     panic!("jacobi() requires 2 arguments");
@@ -1112,7 +1108,7 @@ impl RuntimeEnv {
                     eval_args[2].as_f64() as i64,
                 ))
             }
-            // ── User-defined regular functions ────────────────────────────────
+            // User-defined regular functions
             _ => {
                 if self.pb_funcs.contains_key(name) {
                     panic!(
@@ -1153,7 +1149,7 @@ impl RuntimeEnv {
         RuntimeValue::Int(0) // implicit return 0 if no return statement
     }
 
-    // ── Probabilistic Function Execution ─────────────────────────────────────
+    // Probabilistic Function Execution
 
     /// Execute a pb function body once, returning Certain(v) or Uncertain(v).
     fn call_pb_func_once(&self, func: &PbFuncDef, args: &[RuntimeValue]) -> RuntimeValue {
@@ -1295,7 +1291,7 @@ impl RuntimeEnv {
         (majority, info)
     }
 
-    // ── Statement Execution ───────────────────────────────────────────────────
+    // Statement Execution
 
     fn exec_stmt(&mut self, stmt: &Statement) -> FlowControl {
         match stmt {
@@ -1454,7 +1450,7 @@ impl RuntimeEnv {
                 let dist_val = match mode {
                     DistributionOfMode::Analytical => {
                         // Derive the per-round distribution from the error class alone.
-                        // RP / coRP: per-round probability of Certain ≥ 1/2
+                        // RP / coRP: per-round probability of Certain �� 1/2
                         //   → worst-case rounds-until-Certain ~ Geometric(0.5)
                         // BPP: per-round vote correctness ≥ 3/4
                         //   → model each vote as Bernoulli(0.75)
@@ -1517,7 +1513,7 @@ impl RuntimeEnv {
     }
 }
 
-// ── Pure Maths Helpers ─────────────────────────────────────────────────
+// Pure Maths Helpers
 
 /// Iterative Jacobi symbol (a/n). Returns -1, 0, or 1.
 /// n must be a positive integer. If n is even (or 1) the symbol is not
@@ -1610,7 +1606,7 @@ fn binom_coeff(n: u64, k: u64) -> u64 {
     result
 }
 
-// ── Public API ────────────────────────────────────────────────────────────────
+// Public API
 
 /// Execute all program items and return the output lines.
 /// Shared by `run`, `run_to_string`, and `run_to_html`.

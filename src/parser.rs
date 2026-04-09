@@ -13,7 +13,7 @@ use nom::{
 
 use crate::ast::*;
 
-// ── Whitespace & Comment Handling ────────────────────────────────────────────
+// Whitespace & Comment Handling
 
 /// Skips whitespace and `// line comments` in a loop.
 fn ws0(input: &str) -> IResult<&str, ()> {
@@ -38,7 +38,7 @@ where
     delimited(ws0, inner, ws0)
 }
 
-// ── Keyword Helper ───────────────────────────────────────────────────────────
+// Keyword Helper
 
 /// Matches `kw` only when NOT followed by an alphanumeric character or `_`,
 /// ensuring we don't accidentally match a prefix of an identifier like `mod_exp`.
@@ -54,7 +54,7 @@ fn keyword<'a>(kw: &'static str) -> impl FnMut(&'a str) -> IResult<&'a str, &'a 
     }
 }
 
-// ── Identifiers ──────────────────────────────────────────────────────────────
+// Identifiers
 
 fn parse_identifier(input: &str) -> IResult<&str, &str> {
     recognize(pair(
@@ -63,7 +63,7 @@ fn parse_identifier(input: &str) -> IResult<&str, &str> {
     ))(input)
 }
 
-// ── Top-Level ────────────────────────────────────────────────────────────────
+// Top-Level
 
 fn parse_program(input: &str) -> IResult<&str, Vec<ProgramItem>> {
     terminated(many0(eat_ws(parse_program_item)), ws0)(input)
@@ -79,7 +79,7 @@ fn parse_program_item(input: &str) -> IResult<&str, ProgramItem> {
     .parse(input)
 }
 
-// ── Statements ───────────────────────────────────────────────────────────────
+// Statements
 
 fn parse_statement_list(input: &str) -> IResult<&str, Vec<Statement>> {
     many0(terminated(parse_statement, eat_ws(tag(";"))))(input)
@@ -241,7 +241,7 @@ fn parse_assignment_rhs(input: &str) -> IResult<&str, Expr> {
     preceded(eat_ws(tag("=")), eat_ws(parse_expr))(input)
 }
 
-// ── Function Definitions ──────────────────────────────────────────────────────
+// Function Definitions
 
 fn parse_fn_def(input: &str) -> IResult<&str, FuncDef> {
     let (input, _) = eat_ws(keyword("fn"))(input)?;
@@ -331,7 +331,7 @@ fn parse_type_named(input: &str) -> IResult<&str, Type> {
     Ok((rest, Type::Named(name.to_string())))
 }
 
-// ── Enum Definitions ──────────────────────────────────────────────────────────
+// Enum Definitions
 
 /// Parses `enum TypeName { Variant1, Variant2, ... }`
 /// Both the type name and every variant must start with an uppercase letter.
@@ -391,7 +391,7 @@ fn parse_param(input: &str) -> IResult<&str, FuncParam> {
     Ok((input, FuncParam { name: name.to_string(), ty }))
 }
 
-// ── Argument / Pair Lists ─────────────────────────────────────────────────────
+// Argument / Pair Lists
 
 fn parse_arg_list_optional(input: &str) -> IResult<&str, Vec<Expr>> {
     opt(parse_arg_list)(input).map(|(input, maybe)| (input, maybe.unwrap_or_default()))
@@ -429,7 +429,7 @@ fn parse_discrete_pair(input: &str) -> IResult<&str, (Box<Expr>, Box<Expr>)> {
     Ok((input, (Box::new(key), Box::new(value))))
 }
 
-// ── Expression Parsing ────────────────────────────────────────────────────────
+// Expression Parsing
 // Precedence (lowest → highest):
 //   OR → AND → CMP → ADD → MUL → UNARY → PRIMARY(+postfix)
 
@@ -570,15 +570,20 @@ fn parse_dot_method(input: &str) -> IResult<&str, (String, Vec<Expr>)> {
 fn parse_primary_term(input: &str) -> IResult<&str, Expr> {
     alt((
         delimited(eat_ws(tag("(")), parse_expr, eat_ws(tag(")"))),
+
         // Array literals: [expr, expr, ...]
         parse_array_literal,
+
         // Boolean literals must come before generic identifier/call parsing.
         map(eat_ws(keyword("true")), |_| Expr::Bool(true)),
         map(eat_ws(keyword("false")), |_| Expr::Bool(false)),
+
         // Function/constructor calls (includes Certain, Uncertain, distribution ctors).
         parse_func_call,
+
         // Variable reference (with optional legacy `:method()` suffix).
         parse_var,
+
         // Numeric literals.
         parse_number_literal,
     ))
@@ -602,7 +607,7 @@ fn parse_func_call(input: &str) -> IResult<&str, Expr> {
     let (input, _) = eat_ws(tag("("))(input)?;
 
     match func_name {
-        // ── Certainty markers ──────────────────────────────────────────────
+        // Certainty markers
         "Certain" => {
             let (input, inner) = parse_expr(input)?;
             let (input, _) = eat_ws(tag(")"))(input)?;
@@ -613,7 +618,7 @@ fn parse_func_call(input: &str) -> IResult<&str, Expr> {
             let (input, _) = eat_ws(tag(")"))(input)?;
             Ok((input, Expr::Uncertain(Box::new(inner))))
         }
-        // ── Distribution constructors ──────────────────────────────────────
+        // Distribution constructors
         "uniform" => {
             let (input, args) = parse_arg_list_optional(input)?;
             let (input, _) = eat_ws(tag(")"))(input)?;
@@ -692,7 +697,7 @@ fn parse_func_call(input: &str) -> IResult<&str, Expr> {
             }
             Ok((input, Expr::Dist(Dist::Geometric(Box::new(args[0].clone())))))
         }
-        // ── Generic function call ──────────────────────────────────────────
+        // Generic function call
         _ => {
             let (input, args) = parse_arg_list_optional(input)?;
             let (input, _) = eat_ws(tag(")"))(input)?;
@@ -734,7 +739,7 @@ fn is_reserved_keyword(s: &str) -> bool {
     )
 }
 
-// ── Literals ──────────────────────────────────────────────────────────────────
+// Literals
 
 fn parse_number_literal(input: &str) -> IResult<&str, Expr> {
     let (input, int_part) = take_while1(|c: char| c.is_ascii_digit())(input)?;
@@ -768,7 +773,7 @@ fn parse_float_value(input: &str) -> IResult<&str, f64> {
     Ok((input, f64::from_str(&s).unwrap()))
 }
 
-// ── Public Entry Point ────────────────────────────────────────────────────────
+// Public Entry Point
 
 pub fn parse(input: &str) -> Vec<ProgramItem> {
     match parse_program(input) {

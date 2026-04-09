@@ -10,7 +10,7 @@ use std::path::Path;
 
 use crate::interpreter::try_run_program;
 
-// ── Helpers ───────────────────────────────────────────────────────────────────
+// Helpers
 
 /// Run a program that should succeed and compare output against expected.
 pub fn run_passing_test(source_path: &str) {
@@ -67,7 +67,7 @@ pub fn run_failing_test(source_path: &str) {
     }
 }
 
-// ── Passing tests ─────────────────────────────────────────────────────────────
+// Passing tests
 
 macro_rules! passing_test {
     ($test_name:ident, $file:expr) => {
@@ -106,7 +106,7 @@ passing_test!(map_deterministic,         "MapDeterministic.txt");
 passing_test!(distribution_equality,     "DistributionEquality.txt");
 passing_test!(markov_chain,              "MarkovChain.txt");
 
-// ── Failing tests ─────────────────────────────────────────────────────────────
+// Failing tests
 
 macro_rules! failing_test {
     ($test_name:ident, $file:expr) => {
